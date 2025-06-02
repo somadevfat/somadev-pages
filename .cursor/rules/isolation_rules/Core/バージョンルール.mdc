@@ -1,0 +1,71 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+下記バージョンを使って制作する。実装前にcontext7 mcpで最新の情報を取得する。必ずそこから実装。
+# 2025年推奨技術スタックバージョン
+
+## メインテンプレートのバージョン
+
+### 1. Vercel公式 Next.js Portfolio Starter
+```json
+{
+  "next": "^15.0.0",
+  "react": "^18.3.0", 
+  "react-dom": "^18.3.0",
+  "typescript": "^5.6.0",
+  "@types/node": "^22.0.0",
+  "@types/react": "^18.3.0",
+  "@types/react-dom": "^18.3.0"
+}
+```
+
+### 2. 自作する場合の推奨構成
+```json
+{
+  "next": "15.1.0",
+  "react": "18.3.1",
+  "react-dom": "18.3.1",
+  "typescript": "5.7.2",
+  "tailwindcss": "3.4.15",
+  "autoprefixer": "10.4.20",
+  "postcss": "8.5.1",
+  "eslint": "9.17.0",
+  "eslint-config-next": "15.1.0"
+}
+```
+
+### 3. 人気のテンプレート（TailwindCSS使用）
+```json
+{
+  "next": "14.2.0",
+  "react": "18.3.1",
+  "tailwindcss": "3.4.0",
+  "@tailwindcss/typography": "0.5.15",
+  "framer-motion": "11.11.17",
+  "next-themes": "0.4.3"
+}
+```
+
+## 追加でよく使われるライブラリ
+
+### UI・スタイリング
+- **Tailwind CSS**: `^3.4.15`
+- **Framer Motion**: `^11.11.17` (アニメーション)
+- **Lucide React**: `^0.469.0` (アイコン)
+- **next-themes**: `^0.4.3` (ダーク/ライトモード)
+
+### Markdown・コンテンツ
+- **gray-matter**: `^4.0.3` (Frontmatter解析)
+- **remark**: `^15.0.1`
+- **remark-html**: `^16.0.1`
+- **next-mdx-remote**: `^5.0.0`
+
+### SEO・メタデータ
+- **next-seo**: `^6.6.0`
+- **sitemap**: `^8.0.0`
+
+## Node.js バージョン要件
+- **推奨**: Node.js 18.17.0 以上
+- **最新**: Node.js 22.x LTS
