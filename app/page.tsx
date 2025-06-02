@@ -24,44 +24,67 @@ import Image from 'next/image';
 //   };
 // }
 
-export default function HomePage() { // async を削除
+export default function HomePage() {
   // const sampleArticle = await getSampleArticle();
 
   return (
     <Layout>
-      <section className="my-8 text-center">
-        <div className="mb-8">
-          <Image
-            src="https://via.placeholder.com/150"
-            alt="Your Name"
-            width={150}
-            height={150}
-            className="rounded-full mx-auto"
-            priority 
-          />
-        </div>
-        <h1 className="text-4xl font-bold mb-4">
-          Hey, I'm Your Name! 👋
-        </h1>
-        <p className="text-lg text-gray-700 max-w-2xl mx-auto">
-          ここに簡単な自己紹介文が入ります。Webデベロッパーで、美しいフロントエンドと効率的なバックエンドの構築に情熱を注いでいます。趣味は新しい技術の探求と美味しいコーヒーを淹れることです。
-        </p>
-        
-        <div className="mt-12 border-t pt-8">
-          <h3 className="text-lg font-medium mb-2">next/image テスト (元々あったもの)</h3>
-          <Image
-            src="https://via.placeholder.com/600x300.png?text=Dummy+Image"
-            alt="Dummy Image"
-            width={600}
-            height={300}
-          />
-        </div>
+      <section className="py-12 md:py-20">
+        <div className="container mx-auto px-4">
+          <div className="grid md:grid-cols-3 gap-x-8 lg:gap-x-12 items-start">
+            {/* Left Column: Text Content */}
+            <div className="md:col-span-2 prose prose-lg lg:prose-xl max-w-none text-textDark">
+              <h1 className="text-4xl md:text-5xl font-bold mb-6">
+                Hey, I'm Soma! 👋
+              </h1>
+              
+              <div className="mb-8">
+                <h2 className="text-2xl font-semibold mb-3 text-textDark">About</h2>
+                <p>
+                  I'm a Developer with a passion for creating beautiful and efficient web systems. 
+                  My journey in tech has been driven by a love for continuous learning and a desire to build impactful solutions.
+                </p>
+              </div>
 
-        {/* サンプル記事の表示は一旦コメントアウト
-        <article className="mt-8 prose lg:prose-xl text-left"> 
-          // ... (sample article content)
-        </article>
-        */}
+              <div className="mb-8">
+                <h3 className="text-xl font-semibold mb-2 text-textDark">Expertise:</h3>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>TypeScript, Node.js, React</li>
+                  <li>Serverless Architectures</li>
+                  <li>Technical SEO</li>
+                  <li>Next.js, TailwindCSS</li>
+                </ul>
+              </div>
+
+              <div className="mb-8">
+                <h3 className="text-xl font-semibold mb-2 text-textDark">Love:</h3>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>Open Source Software</li>
+                  <li>Personal Development (個人開発)</li>
+                  <li>Exploring new technologies</li>
+                </ul>
+              </div>
+              
+              <p className="mt-8 text-lg font-medium text-textDark">
+                Soma
+              </p>
+            </div>
+
+            {/* Right Column: Profile Image */}
+            <div className="md:col-span-1 mt-8 md:mt-0 flex justify-center md:justify-end">
+              <div className="relative w-48 h-48 md:w-64 md:h-64 lg:w-72 lg:h-72">
+                <Image
+                  src="/profile.jpg" // publicディレクトリからのパス
+                  alt="Soma - Profile Picture"
+                  layout="fill"
+                  objectFit="cover"
+                  className="rounded-lg shadow-lg"
+                  priority
+                />
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
     </Layout>
   );

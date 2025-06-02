@@ -12,6 +12,7 @@ module.exports = {
         black: '#000000',
         blue: '#0070f3',
         chicBlue: '#3B82F6',
+        textDark: '#222222',
       },
       fontFamily: {
         sans: ['system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', '"Noto Sans"', 'sans-serif', '"Apple Color Emoji"', '"Segoe UI Emoji"', '"Segoe UI Symbol"', '"Noto Color Emoji"'],
@@ -19,7 +20,7 @@ module.exports = {
       typography: (theme) => ({
         DEFAULT: {
           css: {
-            color: theme('colors.gray.800'),
+            color: theme('colors.textDark'),
             a: {
               color: theme('colors.chicBlue'),
               '&:hover': {
