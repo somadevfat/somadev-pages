@@ -29,9 +29,9 @@ export default async function HomePage() {
 
   return (
     <Layout>
-      <header className="py-4 bg-gray-100 text-center">
+      {/* <header className="py-4 bg-gray-100 text-center">
         <h1 className="text-2xl font-bold">仮ヘッダー</h1>
-      </header>
+      </header> */}
 
       <section className="my-8">
         <h2 className="text-xl font-semibold mb-4">メインコンテンツエリア</h2>
@@ -56,9 +56,9 @@ export default async function HomePage() {
         </article>
       </section>
 
-      <footer className="py-4 bg-gray-100 text-center">
+      {/* <footer className="py-4 bg-gray-100 text-center">
         <p>&copy; 2024 仮フッター</p>
-      </footer>
+      </footer> */}
     </Layout>
   );
 }
