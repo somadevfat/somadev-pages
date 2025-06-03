@@ -4,8 +4,8 @@ const Header = () => {
   const contactUrl = "/contact"; // Placeholder, assuming a contact page or section
 
   return (
-    <header className="py-4 border-b border-gray-200">
-      <div className="container mx-auto px-4 flex justify-between items-center w-full">
+    <header className="w-full py-4 border-b border-gray-200">
+      <div className="max-w-4xl w-full mx-auto px-4 flex justify-between items-center">
         <Link href="/" className="text-lg sm:text-xl font-semibold text-textDark hover:text-chicBlue whitespace-nowrap">
           soma-pages
         </Link>
