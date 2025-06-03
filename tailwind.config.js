@@ -24,6 +24,13 @@ module.exports = {
         'body-lg': ['1.125rem', { lineHeight: '1.7' }], // 例: 18px
         'body-base': ['1rem', { lineHeight: '1.8' }],    // 例: 16px
         'body-sm': ['0.875rem', { lineHeight: '1.6' }], // 例: 14px
+        'header-title': '20px',        // ヘッダーのサイトタイトル用
+        'header-nav': '16px',          // ヘッダーのナビゲーションリンク用
+        'main-heading': '20px',        // "Hey, I'm Soma!" 用
+        'section-title-sm': '16px',    // "About" 等の小さなセクションタイトル用
+        'section-title-lg': '32px',    // "Career", "Projects", "Articles" 等の大きなセクションタイトル用
+        'item-title': '20px',          // Career/Project/Article の各アイテムのタイトル用
+        'item-meta': '14px',           // 日付や技術スタック等の補足情報用
       },
       spacing: {
         'section-y': '5rem',     // 4remから5rem (80px) に変更
