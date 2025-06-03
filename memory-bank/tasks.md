@@ -137,6 +137,7 @@ Type: Feature Enhancement
 - [x] `https://www.hand-dot.com/` 構造調査 (ユーザー提供情報により完了)
 - [x] `soma-pages` 現状構造調査 (前回調査及びユーザー提供情報により完了)
 - [x] 差分分析と改修項目の洗い出し
+  - フォントサイズ、余白などのユーティリティクラスを Tailwind 設定・コンポーネントで集中管理し、ハードコーディングをやめる
   - 全体的なレイアウトとセクション分割 (`/` をAboutとし、その下にCareer, Projects, Articles(Blog)を配置)
   - ヘッダーナビゲーション更新 (Blog/Articles, Career, Projects を主要リンクとする)
   - Aboutセクション (`app/page.tsx`) レイアウト改修 (左テキスト、右画像)
@@ -150,18 +151,19 @@ Type: Feature Enhancement
   - **変更対象ファイル:** `app/page.tsx`, `app/layout.tsx`, `components/Header.tsx`, `components/Footer.tsx`, `app/globals.css`, `tailwind.config.js` (新規: `app/career/page.tsx`, `app/projects/page.tsx`)
   - **実装ステップ:**
     1. グローバルスタイル調整 (フォント、カラー)
-    2. Header/Footer修正 (ナビゲーションリンク追加)
-    3. Aboutページ (`app/page.tsx`) 改修 (2カラムレイアウト、プロフィール画像、テキストコンテンツ)
-    4. Careerページ (`app/career/page.tsx`) 新規作成 (プレースホルダーコンテンツ)
-    5. Projectsページ (`app/projects/page.tsx`) 新規作成 (プレースホルダーコンテンツ)
-    6. Articles(Blog)ページ デザイン調整
-    7. レスポンシブ対応
-    8. 動作確認と微調整
+    2. Tailwind設定でフォントサイズと余白のカスタムユーティリティを定義し、一括管理を可能にする
+    3. Header/Footer修正 (ナビゲーションリンク追加)
+    4. Aboutページ (`app/page.tsx`) 改修 (2カラムレイアウト、プロフィール画像、テキストコンテンツ)
+    5. Careerページ (`app/career/page.tsx`) 新規作成 (プレースホルダーコンテンツ)
+    6. Projectsページ (`app/projects/page.tsx`) 新規作成 (プレースホルダーコンテンツ)
+    7. Articles(Blog)ページ デザイン調整
+    8. レスポンシブ対応
+    9. 動作確認と微調整
   - **想定される課題:** CSS/Tailwindでの正確なレイアウト再現、コンテンツ準備、画像最適化。
   - **テスト戦略:** 手動テスト (表示、ナビゲーション、レスポンシブ)、リンター/フォーマッター実行。
   - **クリエイティブ要素:** UI/UXデザイン (レイアウト、フォント、カラー) は `hand-dot.com` を参考に実装中に調整。
 - [ ] CREATIVE Mode: (Optional, if significant UI changes are needed)
-- [ ] IMPLEMENT Mode: 実装
+- [x] IMPLEMENT Mode: 実装
 - [ ] QA Mode: テスト
 
 ## 影響範囲

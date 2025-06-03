@@ -17,16 +17,30 @@ module.exports = {
       fontFamily: {
         sans: ['system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', '"Noto Sans"', 'sans-serif', '"Apple Color Emoji"', '"Segoe UI Emoji"', '"Segoe UI Symbol"', '"Noto Color Emoji"'],
       },
+      fontSize: {
+        'display': ['2.5rem', { lineHeight: '1.2' }],    // 例: 40px
+        'heading-lg': ['2rem', { lineHeight: '1.25' }], // 例: 32px
+        'heading-md': ['1.5rem', { lineHeight: '1.3' }], // 例: 24px
+        'body-lg': ['1.125rem', { lineHeight: '1.7' }], // 例: 18px
+        'body-base': ['1rem', { lineHeight: '1.8' }],    // 例: 16px
+        'body-sm': ['0.875rem', { lineHeight: '1.6' }], // 例: 14px
+      },
+      spacing: {
+        'section-y': '5rem',     // 4remから5rem (80px) に変更
+        'content-gap': '2rem',   // 例: 32px
+        'item-gap': '1rem',      // 例: 16px
+      },
       typography: (theme) => ({
         DEFAULT: {
           css: {
             color: theme('colors.textDark'),
             a: {
               color: theme('colors.chicBlue'),
+              textDecoration: 'none', // デフォルトの下線を削除
               '&:hover': {
-                color: theme('colors.chicBlue'),
+                color: theme('colors.chicBlue'), // ホバー時の色はそのままか、少し濃くしても良い
+                textDecoration: 'underline', // ホバー時に下線を表示
               },
-              textDecoration: 'underline',
             },
             h1: {
               color: theme('colors.gray.900'),
@@ -49,8 +63,8 @@ module.exports = {
               borderRadius: '0.25rem',
               fontWeight: '400',
             },
-            fontSize: '1rem',
-            lineHeight: '1.8',
+            fontSize: '1rem', // typography プラグインの基本フォントサイズ
+            lineHeight: '1.8', // typography プラグインの基本行の高さ
             p: {
               marginTop: '1.25em',
               marginBottom: '1.25em',
@@ -58,6 +72,20 @@ module.exports = {
           },
         },
       }),
+      animation: {
+        wave: 'wave 2.5s infinite',
+      },
+      keyframes: {
+        wave: {
+          '0%, 100%': { transform: 'rotate(0deg)' },
+          '10%, 30%': { transform: 'rotate(14deg)' },
+          '20%': { transform: 'rotate(-8deg)' },
+          '40%': { transform: 'rotate(14deg)' },
+          '50%': { transform: 'rotate(-4deg)' },
+          '60%': { transform: 'rotate(10deg)' },
+          '70%': { transform: 'rotate(0deg)' },
+        }
+      }
     },
   },
   plugins: [

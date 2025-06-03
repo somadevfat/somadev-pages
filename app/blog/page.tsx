@@ -1,30 +1,35 @@
 import Layout from '@/components/Layout';
 import Link from 'next/link';
-import { getSortedArticlesData, ArticleData } from '@/lib/articles';
+import { getSortedArticlesData } from '@/lib/articles';
 
 export default function ArticlesPage() {
   const articles = getSortedArticlesData();
 
   return (
     <Layout>
-      <section className="py-12 md:py-20">
+      <section className="py-section-y">
         <div className="container mx-auto px-4">
-          <h1 className="text-4xl md:text-5xl font-bold mb-12 text-center text-textDark">
+          <h1 className="text-heading-lg font-semibold mb-content-gap text-textDark">
             Articles
           </h1>
           {articles.length === 0 ? (
-            <p className="text-center text-gray-600">No articles found.</p>
+            <div className="max-w-2xl">
+              <p className="text-body-base text-gray-600">No articles found.</p>
+            </div>
           ) : (
-            <div className="max-w-3xl mx-auto">
-              <ul className="space-y-8">
+            <div className="max-w-2xl">
+              <ul className="space-y-0">
                 {articles.map((article, index) => (
-                  <li key={article.slug} className={index < articles.length - 1 ? "pb-8 border-b border-gray-200" : "pb-8"}>
+                  <li 
+                    key={article.slug} 
+                    className={`py-content-gap ${index < articles.length - 1 ? "border-b border-gray-300" : ""}`}
+                  >
                     <Link href={`/blog/${article.slug}`} className="block group">
-                      <h2 className="text-2xl md:text-3xl font-semibold text-chicBlue group-hover:underline mb-2">
+                      <h2 className="text-heading-md font-semibold text-textDark group-hover:text-chicBlue group-hover:underline mb-px">
                         {article.title}
                       </h2>
-                      <p className="text-sm text-gray-500 mb-3">{article.date}</p>
-                      <p className="text-gray-700 leading-relaxed">
+                      <p className="text-body-sm text-gray-500 mb-item-gap">{article.date}</p>
+                      <p className="text-body-base text-gray-700">
                         {article.summary}
                       </p>
                     </Link>
@@ -35,6 +40,9 @@ export default function ArticlesPage() {
           )}
         </div>
       </section>
+      <div className="container mx-auto px-4">
+        <hr className="my-section-y border-t border-gray-200" />
+      </div>
     </Layout>
   );
 } 
