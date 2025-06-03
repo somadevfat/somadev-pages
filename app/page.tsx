@@ -24,44 +24,158 @@ import Image from 'next/image';
 //   };
 // }
 
-export default function HomePage() { // async を削除
+export default function HomePage() {
   // const sampleArticle = await getSampleArticle();
 
   return (
     <Layout>
-      <section className="my-8 text-center">
-        <div className="mb-8">
-          <Image
-            src="https://via.placeholder.com/150"
-            alt="Your Name"
-            width={150}
-            height={150}
-            className="rounded-full mx-auto"
-            priority 
-          />
-        </div>
-        <h1 className="text-4xl font-bold mb-4">
-          Hey, I'm Your Name! 👋
-        </h1>
-        <p className="text-lg text-gray-700 max-w-2xl mx-auto">
-          ここに簡単な自己紹介文が入ります。Webデベロッパーで、美しいフロントエンドと効率的なバックエンドの構築に情熱を注いでいます。趣味は新しい技術の探求と美味しいコーヒーを淹れることです。
-        </p>
-        
-        <div className="mt-12 border-t pt-8">
-          <h3 className="text-lg font-medium mb-2">next/image テスト (元々あったもの)</h3>
-          <Image
-            src="https://via.placeholder.com/600x300.png?text=Dummy+Image"
-            alt="Dummy Image"
-            width={600}
-            height={300}
-          />
-        </div>
+      {/* Hero Section */}
+      <section className="pt-16 pb-20 md:pt-24 md:pb-28 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12">
+            
 
-        {/* サンプル記事の表示は一旦コメントアウト
-        <article className="mt-8 prose lg:prose-xl text-left"> 
-          // ... (sample article content)
-        </article>
-        */}
+            {/* Text Content */}
+            <div className="max-w-xl">
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">
+                Hey, I&apos;m Soma! <span className="inline-block animate-wave">👋</span>
+              </h1>
+              <div className="mb-6">
+                <h2 className="text-sm sm:text-base font-semibold text-gray-700 mb-2">About</h2>
+                <p className="text-base sm:text-lg text-gray-600 leading-relaxed">
+                  I&apos;m a JavaScript Developer with 10+ years of experience in web systems development.
+                </p>
+                <ul className="text-base sm:text-lg text-gray-600 leading-relaxed list-disc list-outside pl-5 space-y-1">
+                  <li className="leading-normal">Expertise: TypeScript, Node.js, React, Serverless, Technical SEO.</li>
+                  <li className="leading-normal">Love: Open Source Software, Personal development (個人開発).</li>
+                </ul>
+              </div>
+            </div>
+            {/* Profile Image */}
+            <div className="w-80 h-40 md:md:w-96 md:h-96 relative shrink-0 overflow-hidden">
+              <Image
+                src="/profile.jpg"
+                alt="Soma - Profile Picture"
+                fill
+                style={{ objectFit: 'cover' }}
+                sizes="(max-width: 768px) 320px, 384px"
+                priority
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Divider */}
+      <div className="container mx-auto px-4">
+        <hr className="my-12 md:my-16 border-t border-gray-200" />
+      </div>
+
+      {/* Career Section */}
+      <section id="career" className="py-12 md:py-20">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-10 md:mb-14 text-center">Career</h2>
+          <div className="space-y-8 max-w-2xl mx-auto">
+            <div className="p-6 bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <h3 className="text-xl font-semibold text-blue-600 mb-1.5">Company Name - Feb 2023 - Present</h3>
+              <p className="text-gray-700">Developer Advocate / Solution Engineer, Solving customer problems...</p>
+            </div>
+            <div className="p-6 bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <h3 className="text-xl font-semibold text-blue-600 mb-1.5">Nulab Inc. - Jan 2021 - Jan 2023</h3>
+              <p className="text-gray-700">Development of the project management tool Backlog.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Divider */}
+      <div className="container mx-auto px-4">
+        <hr className="my-12 md:my-16 border-t border-gray-200" />
+      </div>
+
+      {/* Projects Section */}
+      <section id="projects" className="py-12 md:py-20 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-10 md:mb-14 text-center">Projects</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+              <div className="w-full h-48 relative">
+                <Image
+                  src="/project-placeholder-1.jpg"
+                  alt="Project 1"
+                  fill
+                  style={{ objectFit: 'cover' }}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
+              </div>
+              <div className="p-6">
+                <h3 className="text-xl font-semibold text-blue-600 mb-2">Project Title 1</h3>
+                <p className="text-gray-700 text-sm mb-3">Short description of the project. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                <p className="text-xs text-gray-500">Technologies: React, Next.js, TailwindCSS</p>
+              </div>
+            </div>
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+              <div className="w-full h-48 relative">
+                <Image
+                  src="/project-placeholder-2.jpg"
+                  alt="Project 2"
+                  fill
+                  style={{ objectFit: 'cover' }}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
+              </div>
+              <div className="p-6">
+                <h3 className="text-xl font-semibold text-blue-600 mb-2">Project Title 2</h3>
+                <p className="text-gray-700 text-sm mb-3">Another interesting project. Vivamus magna justo, lacinia eget consectetur sed, convallis at tellus.</p>
+                <p className="text-xs text-gray-500">Technologies: TypeScript, Node.js, GraphQL</p>
+              </div>
+            </div>
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+              <div className="w-full h-48 relative">
+                <Image
+                  src="/project-placeholder-1.jpg"
+                  alt="Project 3"
+                  fill
+                  style={{ objectFit: 'cover' }}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
+              </div>
+              <div className="p-6">
+                <h3 className="text-xl font-semibold text-blue-600 mb-2">Project Title 3</h3>
+                <p className="text-gray-700 text-sm mb-3">A third project to fill the row. Curabitur aliquet quam id dui posuere blandit.</p>
+                <p className="text-xs text-gray-500">Technologies: Python, Django, PostgreSQL</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Divider */}
+      <div className="container mx-auto px-4">
+        <hr className="my-12 md:my-16 border-t border-gray-200" />
+      </div>
+
+      {/* Articles Section */}
+      <section id="articles" className="py-12 md:py-20">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-10 md:mb-14 text-center">Articles</h2>
+          <div className="space-y-6 max-w-2xl mx-auto">
+            <div className="p-6 bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <a href="#" className="block group">
+                <h3 className="text-xl font-semibold text-blue-600 group-hover:underline mb-1.5">Article Title 1: A Comprehensive Guide</h3>
+                <p className="text-gray-500 text-sm mb-2">Published on: Jan 15, 2024</p>
+                <p className="text-gray-700">This article will introduce you to a collection of libraries for creating PDFs in Javascript, showing their use-cases and comparing their features...</p>
+              </a>
+            </div>
+            <div className="p-6 bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <a href="#" className="block group">
+                <h3 className="text-xl font-semibold text-blue-600 group-hover:underline mb-1.5">Manage your life task with GitHub</h3>
+                <p className="text-gray-500 text-sm mb-2">Published on: Dec 20, 2023</p>
+                <p className="text-gray-700">I suggested using Github to manage a personal task, which is already familiar to engineers, and using it for projects other than system development...</p>
+              </a>
+            </div>
+          </div>
+        </div>
       </section>
     </Layout>
   );
