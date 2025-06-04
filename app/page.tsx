@@ -43,12 +43,12 @@ export default function HomePage() {
               <div className="mb-6">
                 <h2 className="text-section-title-sm font-semibold text-gray-700 mb-4">About</h2>
                 <p className="text-body-base text-gray-600 leading-relaxed mb-6">
-                  <span className="block">I&apos;m a JavaScript Developer with 10+ years of</span>
-                  <span className="block">experience in web systems development.</span>
+                  <span className="block">java バックエンドエンジニアを目指し、</span>
+                  <span className="block">個人開発にて学習中。</span>
                 </p>
                 <ul className="text-body-base text-gray-600 leading-relaxed list-disc list-outside pl-5 space-y-2">
-                  <li className="text-body-base leading-normal">Expertise: TypeScript, Node.js, React, Serverless, Technical SEO.</li>
-                  <li className="text-body-base leading-normal">Love: Open Source Software, Personal development (個人開発).</li>
+                  <li className="text-body-base leading-normal">Learning: Java, Kotlin, Android app.</li>
+                  <li className="text-body-base leading-normal">Love: Personal development (個人開発).</li>
                 </ul>
               </div>
             </div>
@@ -73,17 +73,44 @@ export default function HomePage() {
       </div>
 
       {/* Career Section */}
-      <section id="career" className="py-12 md:py-20">
+      <section id="career" className="py-12 md:py-20 ">
         <div className="container mx-auto px-4">
-          <h2 className="text-section-title-lg font-bold text-gray-800 mb-10 md:mb-14 text-center">Career</h2>
-          <div className="space-y-8 max-w-2xl mx-auto">
-            <div className="p-6">
-              <h3 className="text-item-title font-semibold text-blue-600 mb-1.5">Company Name - Feb 2023 - Present</h3>
-              <p className="text-body-base text-gray-700">Developer Advocate / Solution Engineer, Solving customer problems...</p>
-            </div>
-            <div className="p-6">
-              <h3 className="text-item-title font-semibold text-blue-600 mb-1.5">Nulab Inc. - Jan 2021 - Jan 2023</h3>
-              <p className="text-body-base text-gray-700">Development of the project management tool Backlog.</p>
+          <h2 className="text-section-title-lg font-bold text-gray-800 mb-10 md:mb-14 text-center ">Career</h2>
+          <div className="max-w-2xl mx-auto">
+            <p className="text-body-base text-gray-600 leading-relaxed mb-10 text-center">
+              職務内容の詳細（成果や影響など）についてご興味のある方は、メールにてご連絡ください。
+              <br />
+              ご希望に応じて、詳しい履歴書をお送りいたします。
+            </p>
+            <div className="space-y-6">
+
+              {/* 太陽誘電モバイルテクノロジー株式会社 */}
+              <div className="p-6">
+              <h3 className="text-item-title font-semibold text-gray-700 mb-1.5">
+  <a
+    href="https://www.tymt.co.jp/"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="text-sky-700 hover:text-sky-500 hover:underline decoration-sky-500/70 underline-offset-2 transition-colors duration-300 ease-in-out"
+  >
+    太陽誘電モバイルテクノロジー株式会社
+  </a>
+</h3>
+                <ul className="list-disc list-outside pl-5 space-y-1 text-body-base text-gray-700">
+                  <li>電気/ガス/空調/排水 設備管理及び流量計のデータを取り込み、ソフトウェアへの表示。</li>
+                </ul>
+              </div>
+
+              {/* ゴールドCFD取引 */}
+              <div className="p-6">
+                <h3 className="text-item-title font-semibold text-gray-700 mb-1.5">
+                  ゴールドCFD取引 (XAU/USD専門)
+                </h3>
+                <ul className="list-disc list-outside pl-5 space-y-1 text-body-base text-gray-700">
+                  <li>東京時間専門にして、3年間専業として継続。コミュニティでの有益な情報を惜しみなく発信、貢献。</li>
+                </ul>
+              </div>
+
             </div>
           </div>
         </div>
@@ -98,55 +125,40 @@ export default function HomePage() {
       <section id="projects" className="py-12 md:py-20 bg-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-section-title-lg font-bold text-gray-800 mb-10 md:mb-14 text-center">Projects</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div>
-              <div className="w-full h-48 relative">
-                <Image
-                  src="/project-placeholder-1.jpg"
-                  alt="Project 1"
-                  fill
-                  style={{ objectFit: 'cover' }}
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="text-item-title font-semibold text-blue-600 mb-2">Project Title 1</h3>
-                <p className="text-body-base text-gray-700 mb-3">Short description of the project. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-                <p className="text-item-meta text-gray-500">Technologies: React, Next.js, TailwindCSS</p>
-              </div>
+          <div className="max-w-2xl mx-auto space-y-6">
+
+            {/* インジゲーター開発 */}
+            <div className="p-6">
+              <h3 className="text-item-title font-semibold text-gray-700 mb-1.5">インジケーター開発</h3>
+              <ul className="list-disc list-outside pl-5 space-y-1 text-body-base text-gray-700">
+                <li>MQL5, Pine scriptにて手動分析の自動化。</li>
+              </ul>
             </div>
-            <div>
-              <div className="w-full h-48 relative">
-                <Image
-                  src="/project-placeholder-2.jpg"
-                  alt="Project 2"
-                  fill
-                  style={{ objectFit: 'cover' }}
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="text-item-title font-semibold text-blue-600 mb-2">Project Title 2</h3>
-                <p className="text-body-base text-gray-700 mb-3">Another interesting project. Vivamus magna justo, lacinia eget consectetur sed, convallis at tellus.</p>
-                <p className="text-item-meta text-gray-500">Technologies: TypeScript, Node.js, GraphQL</p>
-              </div>
+
+            {/* 価格データ分析アプリ */}
+            <div className="p-6">
+              <h3 className="text-item-title font-semibold text-gray-700 mb-1.5">価格データ分析アプリ</h3>
+              <ul className="list-disc list-outside pl-5 space-y-1 text-body-base text-gray-700">
+                <li>MQL5, Spring boot にて経済指標及び要人発言において、直近価格の変動値で大中小のGUIで瞬時に判断できるwebアプリ開発中。</li>
+              </ul>
             </div>
-            <div>
-              <div className="w-full h-48 relative">
-                <Image
-                  src="/project-placeholder-1.jpg"
-                  alt="Project 3"
-                  fill
-                  style={{ objectFit: 'cover' }}
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="text-item-title font-semibold text-blue-600 mb-2">Project Title 3</h3>
-                <p className="text-body-base text-gray-700 mb-3">A third project to fill the row. Curabitur aliquet quam id dui posuere blandit.</p>
-                <p className="text-item-meta text-gray-500">Technologies: Python, Django, PostgreSQL</p>
-              </div>
+
+            {/* JavaSilver17問題集Andoroidアプリ */}
+            <div className="p-6">
+              <h3 className="text-item-title font-semibold text-gray-700 mb-1.5">JavaSilver17問題集Andoroidアプリ</h3>
+              <ul className="list-disc list-outside pl-5 space-y-1 text-body-base text-gray-700">
+                <li>Java + Xml, Kotlin + Jetpack composeでのjava学習アプリを開発。</li>
+              </ul>
             </div>
+
+            {/* Gemini Gmail Filter */}
+            <div className="p-6">
+              <h3 className="text-item-title font-semibold text-gray-700 mb-1.5">Gemini Gmail Filter</h3>
+              <ul className="list-disc list-outside pl-5 space-y-1 text-body-base text-gray-700">
+                <li>Kotlin + Jetpack composeでのGemini APIを利用したGmail filter個人チーム開発(中、高の友人と共に開発中)。</li>
+              </ul>
+            </div>
+
           </div>
         </div>
       </section>
