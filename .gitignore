@@ -39,3 +39,16 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+#memory-bank
+memory-bank/
+
+.cursor
+
+test.html
+
+tests.md
+
+.env.local
+
+testghost/

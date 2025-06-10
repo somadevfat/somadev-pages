@@ -1,32 +1,36 @@
 import Link from 'next/link';
 
 const Header = () => {
+  const contactUrl = "/contact"; // Placeholder, assuming a contact page or section
+
   return (
-    <header className="py-6 border-b border-gray-200 w-full">
-      <div className="flex justify-between items-center">
-        <Link href="/" className="text-2xl font-bold text-gray-900 hover:text-chicBlue">
-          My Portfolio
+    <header className="w-full border-b border-gray-200">
+      <div className="max-w-4xl w-full mx-auto px-4 py-4 flex justify-between items-center">
+        <Link href="/" className="text-header-title font-semibold text-textDark hover:text-chicBlue whitespace-nowrap">
+          Soma on bush
         </Link>
         <nav>
-          <ul className="flex space-x-6">
+          <ul className="flex space-x-4 sm:space-x-5 items-center flex-wrap justify-end">
             <li>
-              <Link href="/blog" className="text-gray-700 hover:text-chicBlue">
+              <Link href="/blog" className="text-header-nav font-semibold text-textDark hover:text-chicBlue whitespace-nowrap">
                 Blog
               </Link>
             </li>
-            {/* Optional Links - 必要に応じてコメントアウトを解除 */}
-            {/*
             <li>
-              <a href="https://github.com/your-username" target="_blank" rel="noopener noreferrer" className="text-gray-700 hover:text-blue-600">
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://linkedin.com/in/your-profile" target="_blank" rel="noopener noreferrer" className="text-gray-700 hover:text-blue-600">
+              <a href="https://www.linkedin.com/in/somahirano/" target="_blank" rel="noopener noreferrer" className="text-header-nav font-semibold text-textDark hover:text-chicBlue whitespace-nowrap">
                 LinkedIn
               </a>
             </li>
-            */}
+            <li>
+              <Link href="/projects" className="text-header-nav font-semibold text-textDark hover:text-chicBlue whitespace-nowrap">
+                Projects
+              </Link>
+            </li>
+            <li>
+              <Link href={contactUrl} className="text-header-nav font-semibold text-textDark hover:text-chicBlue whitespace-nowrap">
+                Contact
+              </Link>
+            </li>
           </ul>
         </nav>
       </div>
