@@ -17,9 +17,9 @@ const Header = () => {
               </Link>
             </li>
             <li>
-              <Link href="#" className="text-header-nav font-semibold text-textDark hover:text-chicBlue whitespace-nowrap">
+              <a href="https://www.linkedin.com/in/somahirano/" target="_blank" rel="noopener noreferrer" className="text-header-nav font-semibold text-textDark hover:text-chicBlue whitespace-nowrap">
                 LinkedIn
-              </Link>
+              </a>
             </li>
             <li>
               <Link href="/projects" className="text-header-nav font-semibold text-textDark hover:text-chicBlue whitespace-nowrap">
