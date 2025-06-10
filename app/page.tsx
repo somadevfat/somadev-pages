@@ -1,5 +1,6 @@
 import Layout from '@/components/Layout';
 import Image from 'next/image';
+import { FaGithub } from 'react-icons/fa';
 // import fs from 'fs';
 // import path from 'path';
 // import matter from 'gray-matter';
@@ -97,7 +98,10 @@ export default function HomePage() {
   </a>
 </h3>
                 <ul className="list-disc list-outside pl-5 space-y-1 text-body-base text-gray-700">
-                  <li>電気/ガス/空調/排水 設備管理及び流量計のデータを取り込み、ソフトウェアへの表示。</li>
+                  <li>
+                    電気/ガス/空調/排水 設備管理及び流量計のデータを取り込み、<br/>
+                    ソフトウェアへの表示。
+                  </li>
                 </ul>
               </div>
 
@@ -107,7 +111,8 @@ export default function HomePage() {
                   ゴールドCFD取引 (XAU/USD専門)
                 </h3>
                 <ul className="list-disc list-outside pl-5 space-y-1 text-body-base text-gray-700">
-                  <li>東京時間専門にして、3年間専業として継続。コミュニティでの有益な情報を惜しみなく発信、貢献。</li>
+                  <li>東京時間帯に特化し、3年間専業トレーダーとして活動。</li>
+                  <li>コミュニティへ有益な情報を積極的に共有し、貢献。</li>
                 </ul>
               </div>
 
@@ -125,40 +130,155 @@ export default function HomePage() {
       <section id="projects" className="py-12 md:py-20 bg-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-section-title-lg font-bold text-gray-800 mb-10 md:mb-14 text-center">Projects</h2>
-          <div className="max-w-2xl mx-auto space-y-6">
+          <div className="max-w-4xl mx-auto space-y-10">
 
-            {/* インジゲーター開発 */}
-            <div className="p-6">
-              <h3 className="text-item-title font-semibold text-gray-700 mb-1.5">インジケーター開発</h3>
-              <ul className="list-disc list-outside pl-5 space-y-1 text-body-base text-gray-700">
-                <li>MQL5, Pine scriptにて手動分析の自動化。</li>
-              </ul>
+            {/* インジケーター開発 */}
+            <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
+              <div className="flex flex-col md:flex-row-reverse">
+                <div className="w-full md:w-2/5 relative h-64 md:h-96 flex justify-center items-center p-4 bg-gradient-to-b from-gray-50 to-white">
+                  <Image
+                    src="/picture/インジゲータ.jpg"
+                    alt="インジケーター開発のスクリーンショット"
+                    width={220}
+                    height={440}
+                    style={{ objectFit: 'contain', maxHeight: '100%' }}
+                    className="rounded-xl shadow-lg"
+                  />
+                </div>
+                <div className="w-full md:w-3/5 p-8 flex flex-col justify-center">
+                  <div className="flex items-center mb-3">
+                    <h3 className="text-item-title font-semibold text-gray-800 mr-2">
+                      インジケーター開発
+                    </h3>
+                    <a
+                      href="https://github.com/somadevfat/soma-gold-volatility"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gray-700 hover:text-gray-900 transition-colors duration-300"
+                      aria-label="GitHub repository for インジケーター開発"
+                    >
+                      <FaGithub size={24} />
+                    </a>
+                  </div>
+                  <p className="text-body-base text-gray-600 mb-5 leading-relaxed">
+                    相場分析を効率化するために開発したカスタムインジケーター。手動での分析作業をMQL5とPine Scriptで自動化し、分析時間を大幅に短縮しました。
+                  </p>
+                  <div className="text-xs tracking-wider text-gray-500">
+                    <span className="inline-block border border-gray-200 rounded-full px-3 py-1 mr-2 mb-2">MQL5</span>
+                    <span className="inline-block border border-gray-200 rounded-full px-3 py-1 mr-2 mb-2">Pine Script</span>
+                    <span className="inline-block border border-gray-200 rounded-full px-3 py-1 mr-2 mb-2">テクニカル分析</span>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {/* 価格データ分析アプリ */}
-            <div className="p-6">
-              <h3 className="text-item-title font-semibold text-gray-700 mb-1.5">価格データ分析アプリ</h3>
-              <ul className="list-disc list-outside pl-5 space-y-1 text-body-base text-gray-700">
-                <li>MQL5, Spring boot にて経済指標及び要人発言において、直近価格の変動値で大中小のGUIで瞬時に判断できるwebアプリ開発中。</li>
-              </ul>
+            {/* JavaSilver17問題集Androidアプリ */}
+            <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
+              <div className="flex flex-col md:flex-row-reverse">
+                <div className="w-full md:w-2/5 relative h-64 md:h-96 flex justify-center items-center p-4 bg-gradient-to-b from-gray-50 to-white">
+                  <Image
+                    src="/picture/javaapp.gif"
+                    alt="JavaSilver17問題集Androidアプリのデモ"
+                    width={220}
+                    height={440}
+                    style={{ objectFit: 'contain', maxHeight: '100%' }}
+                    className="rounded-xl shadow-lg"
+                  />
+                </div>
+                <div className="w-full md:w-3/5 p-8 flex flex-col justify-center">
+                  <div className="flex items-center mb-3">
+                    <h3 className="text-item-title font-semibold text-gray-800 mr-2">
+                      JavaSilver17問題集Androidアプリ
+                    </h3>
+                    <a
+                      href="https://github.com/somadevfat/quiz-app-contentful"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gray-700 hover:text-gray-900 transition-colors duration-300"
+                      aria-label="GitHub repository for JavaSilver17問題集Androidアプリ"
+                    >
+                      <FaGithub size={24} />
+                    </a>
+                  </div>
+                  <p className="text-body-base text-gray-600 mb-5 leading-relaxed">
+                    Java SE 17資格取得のための学習アプリです。JavaとXMLの従来の方法と、KotlinとJetpack Composeを使用したモダンなUI実装の両方で開発し、Androidアプリ開発スキルを向上させました。
+                  </p>
+                  <div className="text-xs tracking-wider text-gray-500">
+                    <span className="inline-block border border-gray-200 rounded-full px-3 py-1 mr-2 mb-2">Java</span>
+                    <span className="inline-block border border-gray-200 rounded-full px-3 py-1 mr-2 mb-2">Kotlin</span>
+                    <span className="inline-block border border-gray-200 rounded-full px-3 py-1 mr-2 mb-2">Jetpack Compose</span>
+                    <span className="inline-block border border-gray-200 rounded-full px-3 py-1 mr-2 mb-2">Android</span>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {/* JavaSilver17問題集Andoroidアプリ */}
-            <div className="p-6">
-              <h3 className="text-item-title font-semibold text-gray-700 mb-1.5">JavaSilver17問題集Andoroidアプリ</h3>
-              <ul className="list-disc list-outside pl-5 space-y-1 text-body-base text-gray-700">
-                <li>Java + Xml, Kotlin + Jetpack composeでのjava学習アプリを開発。</li>
-              </ul>
+            {/* SnippetButton */}
+            <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
+              <div className="flex flex-col md:flex-row-reverse">
+                <div className="w-full md:w-2/5 relative h-64 md:h-96 flex justify-center items-center p-4 bg-gradient-to-b from-gray-50 to-white">
+                  <Image
+                    src="/picture/すにぺと.gif"
+                    alt="SnippetButtonのデモ"
+                    width={480}
+                    height={320}
+                    style={{ objectFit: 'contain', maxHeight: '100%' }}
+                    className="rounded-xl shadow-lg"
+                  />
+                </div>
+                <div className="w-full md:w-3/5 p-8 flex flex-col justify-center">
+                  <div className="flex items-center mb-3">
+                    <h3 className="text-item-title font-semibold text-gray-800 mr-2">
+                      SnippetButton
+                    </h3>
+                    <a
+                      href="https://github.com/dopqLOL/SnippetButton"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gray-700 hover:text-gray-900 transition-colors duration-300"
+                      aria-label="GitHub repository for SnippetButton"
+                    >
+                      <FaGithub size={24} />
+                    </a>
+                  </div>
+                  <p className="text-body-base text-gray-600 mb-5 leading-relaxed">
+                    Jetpack Compose Multiplatformで開発したデスクトップアプリケーション。ワンクリックでコードスニペットをクリップボードにコピーでき、開発作業の効率化を実現します。マルチプラットフォーム対応で、Windows、Mac、Linuxで利用可能です。
+                  </p>
+                  <div className="text-xs tracking-wider text-gray-500">
+                    <span className="inline-block border border-gray-200 rounded-full px-3 py-1 mr-2 mb-2">Kotlin</span>
+                    <span className="inline-block border border-gray-200 rounded-full px-3 py-1 mr-2 mb-2">Jetpack Compose</span>
+                    <span className="inline-block border border-gray-200 rounded-full px-3 py-1 mr-2 mb-2">Multiplatform</span>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {/* Gemini Gmail Filter */}
-            <div className="p-6">
-              <h3 className="text-item-title font-semibold text-gray-700 mb-1.5">Gemini Gmail Filter</h3>
-              <ul className="list-disc list-outside pl-5 space-y-1 text-body-base text-gray-700">
-                <li>Kotlin + Jetpack composeでのGemini APIを利用したGmail filter個人チーム開発(中、高の友人と共に開発中)。</li>
-              </ul>
+            {/* 価格データ分析アプリ - 見出しのみ残し、本文は削除（開発中のため） */}
+            <div className="bg-white rounded-lg shadow-sm overflow-hidden p-8 hover:shadow-md transition-shadow duration-300">
+              <div className="flex items-center mb-3">
+                <h3 className="text-item-title font-semibold text-gray-800 mr-2">
+                  価格データ分析アプリ（開発中）
+                </h3>
+                <a
+                  href="https://github.com/somadevfat/EconomicIndicators-java"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-700 hover:text-gray-900 transition-colors duration-300"
+                  aria-label="GitHub repository for 価格データ分析アプリ"
+                >
+                  <FaGithub size={24} />
+                </a>
+              </div>
+              <p className="text-body-base text-gray-600 mb-5 leading-relaxed">
+                経済指標発表や要人発言時の価格変動を分析し、直感的なUIで変動の大きさを瞬時に判断できるWebアプリを開発中です。MQL5でデータを収集し、Spring Bootでバックエンド処理を実装しています。
+              </p>
+              <div className="text-xs tracking-wider text-gray-500">
+                <span className="inline-block border border-gray-200 rounded-full px-3 py-1 mr-2 mb-2">MQL5</span>
+                <span className="inline-block border border-gray-200 rounded-full px-3 py-1 mr-2 mb-2">Java</span>
+                <span className="inline-block border border-gray-200 rounded-full px-3 py-1 mr-2 mb-2">Spring Boot</span>
+                <span className="inline-block border border-gray-200 rounded-full px-3 py-1 mr-2 mb-2">データ分析</span>
+              </div>
             </div>
-
           </div>
         </div>
       </section>

@@ -3,7 +3,7 @@ import Link from 'next/link';
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   const githubUrl = "https://github.com/soma-dev"; // Placeholder
-  const linkedInUrl = "https://www.linkedin.com/in/%E8%8D%89%E9%A6%AC-%E5%B9%B3%E9%87%8E-6733b2368/";
+  const linkedInUrl = "https://www.linkedin.com/in/somahirano/";
 
   return (
     <footer className="py-10 border-t border-gray-200 mt-auto w-full text-center">
