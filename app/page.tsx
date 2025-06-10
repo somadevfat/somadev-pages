@@ -108,7 +108,7 @@ export default function HomePage() {
               {/* ゴールドCFD取引 */}
               <div className="p-6">
                 <h3 className="text-item-title font-semibold text-gray-700 mb-1.5">
-                  ゴールドCFD取引 (XAU/USD専門)
+                  金相場トレーダー (XAU/USD専門)
                 </h3>
                 <ul className="list-disc list-outside pl-5 space-y-1 text-body-base text-gray-700">
                   <li>東京時間帯に特化し、3年間専業トレーダーとして活動。</li>
@@ -294,17 +294,44 @@ export default function HomePage() {
           <h2 className="text-section-title-lg font-bold text-gray-800 mb-10 md:mb-14 text-center">Articles</h2>
           <div className="space-y-6 max-w-2xl mx-auto">
             <div className="p-6">
-              <a href="#" className="block group">
-                <h3 className="text-item-title font-semibold text-blue-600 group-hover:underline mb-1.5">Article Title 1: A Comprehensive Guide</h3>
-                <p className="text-item-meta text-gray-500 mb-2">Published on: Jan 15, 2024</p>
-                <p className="text-body-base text-gray-700">This article will introduce you to a collection of libraries for creating PDFs in Javascript, showing their use-cases and comparing their features...</p>
+              <a href="https://zenn.dev/wyuma/articles/6ec13d3c2553d4" target="_blank" rel="noopener noreferrer" className="block group">
+                <h3 className="text-item-title font-semibold text-gray-800 group-hover:underline mb-1.5">Android開発 主要ライブラリ・クラス リファレンス</h3>
+                <p className="text-item-meta text-gray-500 mb-2">公開日: 2025/05/09</p>
+                <p className="text-body-base text-gray-700">
+                  • Android Jetpack (Activity, Fragment, ViewModel, Compose)
+                  <br />
+                  • Kotlin Coroutines と Flow API
+                  <br />
+                  • ネットワーク通信、Google API
+                  <br />
+                  • Android標準API (Context, Intent, Log, Resources)
+                </p>
               </a>
             </div>
             <div className="p-6">
-              <a href="#" className="block group">
-                <h3 className="text-item-title font-semibold text-blue-600 group-hover:underline mb-1.5">Manage your life task with GitHub</h3>
-                <p className="text-item-meta text-gray-500 mb-2">Published on: Dec 20, 2023</p>
-                <p className="text-body-base text-gray-700">I suggested using Github to manage a personal task, which is already familiar to engineers, and using it for projects other than system development...</p>
+              <a href="https://zenn.dev/wyuma/articles/ddb90b50a9ff19" target="_blank" rel="noopener noreferrer" className="block group">
+                <h3 className="text-item-title font-semibold text-gray-800 group-hover:underline mb-1.5">なぜ複数のプログラミング言語を使い分けるのか？</h3>
+                <p className="text-item-meta text-gray-500 mb-2">公開日: 2025/05/16</p>
+                <p className="text-body-base text-gray-700">
+                  • C、C++、Java、Python各言語の特徴と役割
+                  <br />
+                  • 「適材適所」で言語を使い分ける理由
+                  <br />
+                  • プロジェクトに適した言語選択のポイント
+                </p>
+              </a>
+            </div>
+            <div className="p-6">
+              <a href="https://zenn.dev/wyuma/articles/3db1832a1295bd" target="_blank" rel="noopener noreferrer" className="block group">
+                <h3 className="text-item-title font-semibold text-gray-800 group-hover:underline mb-1.5">GitHub ActionsのAndroidテストが数時間も終わらない？根本原因と対策</h3>
+                <p className="text-item-meta text-gray-500 mb-2">公開日: 2025/06/10</p>
+                <p className="text-body-base text-gray-700">
+                  • ディスパッチャーの競合によるテストハングの原因
+                  <br />
+                  • CI/CD環境でのみ発生する問題の解決方法
+                  <br />
+                  • Kotlinコルーチンテストの安定化テクニック
+                </p>
               </a>
             </div>
           </div>
