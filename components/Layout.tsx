@@ -14,8 +14,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <main className="flex-grow py-8">
           {children}
         </main>
-        <Footer />
       </div>
+      <Footer />
     </div>
   );
 };

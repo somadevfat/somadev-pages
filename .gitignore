@@ -48,3 +48,7 @@ memory-bank/
 test.html
 
 tests.md
+
+.env.local
+
+testghost/
