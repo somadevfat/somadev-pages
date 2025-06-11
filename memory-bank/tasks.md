@@ -168,7 +168,8 @@
     - チケットBE-04で完成した、動作するバックエンドAPIのエンドポイント。
 - **Output:**
     - `lib/api-client.ts` が、ハードコードされた値を返す代わりに `fetch` を使ってバックエンドコンテナのURL (`http://backend:8080/api/...`) を叩くようになる。
-
+- **Pull Request:** https://github.com/somadevfat/somadev-pages/pull/15
+- **ステータス:** レビュー待ち (BE-04待ち)
 ### 🎟️ チケット I-01: 最終統合テスト (Final Integration)
 
 - **担当:** General
