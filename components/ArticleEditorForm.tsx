@@ -1,10 +1,25 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import MDEditor from '@uiw/react-md-editor';
+import { Content } from '@/types/content';
 
-export default function ArticleEditorForm() {
-  const [markdown, setMarkdown] = useState('**Hello world!!!**');
+interface ArticleEditorFormProps {
+  article?: Content;
+}
+
+export default function ArticleEditorForm({ article }: ArticleEditorFormProps) {
+  const [title, setTitle] = useState('');
+  const [slug, setSlug] = useState('');
+  const [markdown, setMarkdown] = useState('');
+
+  useEffect(() => {
+    if (article) {
+      setTitle(article.title);
+      setSlug(article.slug);
+      setMarkdown(article.content);
+    }
+  }, [article]);
 
   return (
     <form className="space-y-6">
@@ -16,6 +31,8 @@ export default function ArticleEditorForm() {
           type="text"
           name="title"
           id="title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           placeholder="Your Post Title"
         />
@@ -28,8 +45,11 @@ export default function ArticleEditorForm() {
           type="text"
           name="slug"
           id="slug"
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          value={slug}
+          onChange={(e) => setSlug(e.target.value)}
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm disabled:bg-gray-100"
           placeholder="your-post-slug"
+          disabled={!!article} // Disable slug editing for existing articles
         />
       </div>
       <div>
@@ -49,7 +69,7 @@ export default function ArticleEditorForm() {
           type="submit"
           className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
         >
-          Save Post
+          {article ? 'Update Post' : 'Save Post'}
         </button>
       </div>
     </form>
