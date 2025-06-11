@@ -81,6 +81,7 @@
     - `ContentController.java` が作成され、各エンドポイント (`/api/contents/{type}`など) が定義される。
     - `ContentService.java` が作成され、各メソッドが固定のダミーデータ（例: `new ContentDto(...)`）を返す。
     - Postmanやcurlで `GET /api/contents/articles/dummy-post` を叩くと、ハードコードされたJSONが返ってくる状態になる。
+- **ステータス:** 完了
 
 ---
 
