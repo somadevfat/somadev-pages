@@ -52,3 +52,13 @@ tests.md
 .env.local
 
 testghost/
+
+# Spring Boot build artifacts
+/backend/target/
+/backend/*.jar
+
+# Temporary Spring Boot initializer zip
+/backend/*.zip
+
+# VSCode workspace settings
+.vscode/
