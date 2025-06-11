@@ -15,6 +15,24 @@ services:
       - m2_cache:/home/appuser/.m2
     command: ./mvnw spring-boot:run
     tty: true
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/somadev
+      - SPRING_DATASOURCE_USERNAME=soma
+      - SPRING_DATASOURCE_PASSWORD=password
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=somadev
+      - POSTGRES_USER=soma
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
 volumes:
-  m2_cache: 
+  m2_cache:
+  postgres_data: 
