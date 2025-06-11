@@ -32,13 +32,13 @@
 
 - **担当:** General
 - **ブランチ:** `feature/G-02-setup-dev-environment`
-- **説明:** DockerとVSCode Dev Containerを用いて、統一された開発環境を構築します。
+- **説明:** Dockerを用いて、バックエンドのみのコンテナ起動構成に変更します。
 - **Input:**
     - `docs/PROJECT_DESIGN.md` の開発環境セクション。
 - **Output:**
-    - プロジェクトルートに `docker-compose.yml` ファイルが作成される。
-    - プロジェクトルートに `.devcontainer` ディレクトリと、その配下に `devcontainer.json` が作成される。
-    - `backend` ディレクトリ内に、Spring Bootアプリケーションをビルド・実行するための `Dockerfile` が作成される。
+    - プロジェクトルートの `docker-compose.yml` にバックエンドサービスのみが定義される。
+    - フロントエンド関連の `.devcontainer` 設定および `Dockerfile.frontend` は削除される。
+    - `backend` ディレクトリ内の `Dockerfile` がSpring Bootアプリケーションのビルド・実行用に存在し続ける。
 - **ステータス:** 完了
 
 ### 🎟️ チケット BE-01: Spring Bootプロジェクト初期化

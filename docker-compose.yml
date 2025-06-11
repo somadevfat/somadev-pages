@@ -1,24 +1,20 @@
 version: '3.8'
 
 services:
-  frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile.frontend
-    ports:
-      - "3000:3000"
-    volumes:
-      - .:/workspace:cached
-    command: npm run dev
-    tty: true
-
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
     ports:
       - "8080:8080"
     volumes:
       - ./backend:/workspace:cached
+      - m2_cache:/home/appuser/.m2
     command: ./mvnw spring-boot:run
-    tty: true 
+    tty: true
+
+volumes:
+  m2_cache: 

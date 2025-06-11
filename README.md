@@ -39,18 +39,34 @@ The site features:
     npm install
     ```
 
-### Running the Development Server
+### Running the Development Environment
 
-To start the development server, run:
+This project consists of a Next.js frontend and a Spring Boot backend.
+
+#### Frontend (Next.js)
+
+To start the frontend development server, run the following command in the project root directory:
+
 ```bash
 npm run dev
 ```
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-The page auto-updates as you edit files.
+
+#### Backend (Spring Boot)
+
+The backend server runs in a Docker container. Make sure you have Docker and Docker Compose installed.
+
+To start the backend server, run the following command in the project root directory:
+
+```bash
+docker-compose up
+```
+
+The backend API will be available at `http://localhost:8080`.
 
 ### Building for Production
 
-To create an optimized production build, run:
+To create an optimized production build for the frontend, run:
 ```bash
 npm run build
 ```
