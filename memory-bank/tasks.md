@@ -83,6 +83,19 @@
     - Postmanやcurlで `GET /api/contents/articles/dummy-post` を叩くと、ハードコードされたJSONが返ってくる状態になる。
 - **ステータス:** 完了
 
+### 🎟️ チケット BE-03.5: DBコンテナのセットアップ
+
+- **担当:** Backend
+- **ブランチ:** `feature/BE-03.5-setup-db-container`
+- **説明:** `docker-compose.yml` にPostgreSQLデータベースサービスを追加し、バックエンドサービスが接続できるように設定します。
+- **Input:** なし
+- **Output:**
+    - `docker-compose.yml` に `postgres` サービスが定義される。
+    - バックエンドサービスが `depends_on` で `postgres` を待つように設定される。
+    - データベースのデータ永続化のため、Docker volumeが設定される。
+    - `application.properties` に `spring.datasource` 関連の設定が追加される（接続情報は `docker-compose.yml` の環境変数を参照）。
+- **ステータス:** 未着手
+
 ---
 
 ## フェーズ 3: フロントエンド開発 (Frontend Team)
@@ -129,14 +142,18 @@
 ### 🎟️ チケット BE-04: バックエンドのロジック実装 (マージタスク)
 
 - **担当:** Backend
-- **ブランチ:** `feature/BE-04-implement-backend-logic`
-- **説明:** バックエンドサービスのダミー実装を、実際のファイルシステム操作ロジックに置き換えます。
+- **ブランチ:** `feature/BE-04-implement-db-logic`
+- **説明:** バックエンドサービスのダミー実装を、**データベース(PostgreSQL)と連携する**実際のロジックに置き換えます。JPAを使用してデータを永続化します。
 - **Input:**
-    - **マージ元ブランチ:** `feature/BE-03-dummy-controller-and-service`
-    - `memory-bank/creative/creative-reusable-api.md` の実装ガイドライン。
+    - **マージ元ブランチ:** `feature/BE-03.5-setup-db-container`
+    - `docs/PROJECT_DESIGN.md` (改訂版)
 - **Output:**
-    - `ContentService` が実際に `content/articles` ディレクトリのファイルを読み書きするようになる。
-    - APIを叩くと、ダミーデータではなく、実際のファイルに基づいた内容が返される。
+    - `pom.xml`に`spring-boot-starter-data-jpa`と`postgresql`ドライバが追加される。
+    - `ContentDto`に対応する`Content`エンティティクラスが作成される。
+    - `ContentRepository` (JpaRepository) が作成される。
+    - `ContentService`がファイル操作ではなく、`ContentRepository`を通じてDBとやり取りするようになる。
+    - APIを叩くと、DBに基づいた内容が返される。
+- **ステータス:** 未着手
 
 ### 🎟️ チケット FE-04: フロントエンドのAPI連携 (マージタスク)
 
@@ -155,7 +172,8 @@
 - **ブランチ:** `feature/I-01-final-integration-test`
 - **説明:** 全機能を統合し、Dev Container内で一連のユーザーフローが問題なく動作することを確認します。
 - **Input:**
-    - **マージ元ブランチ:** `feature/BE-04-implement-backend-logic`, `feature/FE-04-connect-to-real-api`
+    - **マージ元ブランチ:** `feature/BE-04-implement-db-logic`, `feature/FE-04-connect-to-real-api`
 - **Output:**
-    - 管理画面から記事を作成 → 記事一覧に表示される → 記事を編集 → 内容が更新される → 記事を削除 → 一覧から消える、という一連の動作が正常に完了する。
+    - 管理画面から記事を作成 → DBに保存される → 記事一覧に表示される → 記事を編集 → DB内容が更新される → 記事を削除 → DBから削除される、という一連の動作が正常に完了する。
     - このブランチが `main` にマージされ、タスク完了となる。
+- **ステータス:** 未着手
