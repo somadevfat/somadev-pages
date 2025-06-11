@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "vitest"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",
@@ -28,6 +29,8 @@
     "eslint-config-next": "^15.3.3",
     "postcss": "8.5.1",
     "tailwindcss": "3.4.15",
-    "typescript": "5.7.2"
+    "typescript": "5.7.2",
+    "undici": "^7.10.0",
+    "vitest": "^3.2.3"
   }
 }
