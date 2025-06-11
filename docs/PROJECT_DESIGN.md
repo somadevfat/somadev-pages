@@ -36,7 +36,7 @@ graph TD
         direction LR
         Controller[API Controller]
         Service[Content Service]
-        Storage[Markdownファイル群]
+        Storage[PostgreSQL Database]
     end
 
     User --> WebApp
@@ -77,6 +77,8 @@ AI（アシスタント）は、実装前に必ずこれらのドキュメント
 - **Spring Boot:** 3.x
 - **依存ライブラリ:**
     - `spring-boot-starter-web`: REST API構築用 ([ドキュメント](https://docs.spring.io/spring-boot/docs/current/reference/html/web.html))
+    - `spring-boot-starter-data-jpa`: データベース永続化用 ([ドキュメント](https://docs.spring.io/spring-boot/docs/current/reference/html/data.html#data.sql.jpa-and-spring-data))
+    - `postgresql`: PostgreSQL JDBCドライバ
     - `lombok`: ボイラープレートコード削減 ([ドキュメント](https://projectlombok.org/features/all))
 - **ビルドツール:** Maven
 
