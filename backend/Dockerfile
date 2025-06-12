@@ -1,35 +1,21 @@
-# Use an official OpenJDK runtime as a parent image
-FROM openjdk:17-slim
+# ---- ビルドステージ ----
+FROM maven:3.9-eclipse-temurin-17-focal AS build
 
-# Install gosu for user switching
-RUN apt-get update && apt-get install -y --no-install-recommends gosu && rm -rf /var/lib/apt/lists/*
-
-# Add build arguments for user and group IDs
-ARG UID=1000
-ARG GID=1000
-
-# Set the working directory
+# アプリケーションのソースコードをコンテナにコピー
 WORKDIR /workspace
-
-# Copy all files first
 COPY . .
 
-# Copy entrypoint script and grant execution rights
-COPY entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/entrypoint.sh
+# Mavenでアプリケーションをパッケージング（テストはスキップ）
+RUN mvn package -DskipTests
 
-# Create a non-root user
-RUN groupadd -g $GID -o appgroup && \
-    useradd -m -u $UID -g $GID -s /bin/sh appuser
+# ---- 実行ステージ ----
+FROM eclipse-temurin:17-jre-focal
 
-# Run Maven to download dependencies
-RUN ./mvnw dependency:go-offline -B
+# ビルドステージから生成されたJARファイルをコピー
+COPY --from=build /workspace/target/*.jar app.jar
 
-# Expose the application port
+# ポート8080を開放
 EXPOSE 8080
 
-# Set entrypoint to our script
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-
-# The command to run the application, will be passed to entrypoint.sh
-CMD ["./mvnw", "spring-boot:run"] 
+# コンテナ起動時にJARファイルを実行
+ENTRYPOINT ["java","-jar","/app.jar"] 

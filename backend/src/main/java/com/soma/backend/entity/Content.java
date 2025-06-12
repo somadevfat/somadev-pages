@@ -1,10 +1,5 @@
 package com.soma.backend.entity;
 
-import java.util.Map;
-
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -26,16 +21,18 @@ import lombok.NoArgsConstructor;
 public class Content {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "content_seq")
     private Long id;
 
     @Column(nullable = false, unique = true)
     private String slug;
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "jsonb")
-    private Map<String, Object> metadata;
+    @Column(nullable = false)
+    private String title;
+    
+    @Column(columnDefinition = "TEXT")
+    private String content;
 
     @Column(columnDefinition = "TEXT")
-    private String body;
+    private String metadata;
 } 
