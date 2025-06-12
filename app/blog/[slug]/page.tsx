@@ -1,34 +1,25 @@
 import Layout from '@/components/Layout';
-import { getArticleDataBySlug, getAllArticleSlugs, ArticleData } from '@/lib/articles';
+import { getContent } from '@/lib/api-client';
 import { notFound } from 'next/navigation';
 import type { Metadata, ResolvingMetadata } from 'next';
 import Link from 'next/link';
+import { remark } from 'remark';
+import html from 'remark-html';
 
-export async function generateStaticParams(): Promise<{ slug: string }[]> {
-  const articles = getAllArticleSlugs();
-  return articles.map((article) => ({
-    slug: article.slug,
-  }));
-}
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  { params }: any,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  { params }: { params: { slug: string } },
   _parent: ResolvingMetadata
 ): Promise<Metadata> {
   try {
-    const slug = params?.slug as string;
-    if (!slug) {
-      return {
-        title: 'Article Not Found',
-        description: 'The requested article could not be found.',
-      };
+    const article = await getContent('articles', params.slug);
+    if (!article) {
+      return { title: 'Article Not Found' };
     }
-    const article = await getArticleDataBySlug(slug);
     return {
-      title: article.title,
-      description: article.summary,
+      title: article.metadata.title,
+      description: article.metadata.summary,
     };
   } catch {
     return {
@@ -38,40 +29,33 @@ export async function generateMetadata(
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default async function ArticlePage({ params }: any) {
-  let article: (ArticleData & { contentHtml: string });
-  try {
-    const slug = params?.slug as string;
-    if (!slug) {
-      notFound();
-    }
-    article = await getArticleDataBySlug(slug);
-  } catch {
-    notFound();
-  }
+export default async function ArticlePage({ params }: { params: { slug: string } }) {
+  const article = await getContent('articles', params.slug);
 
   if (!article) {
     notFound();
   }
 
+  const processedContent = await remark().use(html).process(article.body);
+  const contentHtml = processedContent.toString();
+
   return (
     <Layout>
       <article className="py-section-y">
         <div className="container mx-auto px-4 max-w-2xl">
-          <h1 className="text-heading-lg font-semibold mb-item-gap text-textDark">{article.title}</h1>
+          <h1 className="text-heading-lg font-semibold mb-item-gap text-textDark">{article.metadata.title}</h1>
           <div className="flex items-center space-x-2 text-body-sm text-gray-500 mb-content-gap">
-            <span>Published on: {article.date}</span>
-            {article.tags.length > 0 && <span>·</span>}
+            <span>Published on: {article.metadata.date}</span>
+            {article.metadata.tags && article.metadata.tags.length > 0 && <span>·</span>}
             <div className="flex flex-wrap gap-x-2 gap-y-1">
-              {article.tags.map(tag => (
+              {article.metadata.tags?.map((tag: string) => (
                 <Link href={`/blog?tag=${tag}`} key={tag} className="bg-gray-200 text-gray-700 px-2 py-0.5 rounded-sm text-xs hover:bg-chicBlue hover:text-white">
                   {tag}
                 </Link>
               ))}
             </div>
           </div>
-          <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: article.contentHtml }} />
+          <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: contentHtml }} />
         </div>
       </article>
       <div className="container mx-auto px-4">

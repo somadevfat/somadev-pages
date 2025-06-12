@@ -102,7 +102,7 @@ export default function BlogPageClient({ articles, tags, totalArticles, currentP
     let filtered = articles;
 
     if (selectedTag) {
-      filtered = filtered.filter(article => article.tags.includes(selectedTag));
+      filtered = filtered.filter(article => article.tags && article.tags.includes(selectedTag));
     }
 
     if (searchQuery) {
@@ -152,9 +152,9 @@ export default function BlogPageClient({ articles, tags, totalArticles, currentP
                           </h2>
                           <div className="flex items-center space-x-2 text-body-sm text-gray-500 mb-item-gap">
                             <span>{article.date}</span>
-                            {article.tags.length > 0 && <span>·</span>}
+                            {article.tags && article.tags.length > 0 && <span>·</span>}
                             <div className="flex flex-wrap gap-x-2 gap-y-1">
-                              {article.tags.map(tag => (
+                              {article.tags?.map(tag => (
                                 <span key={tag} className="bg-gray-200 text-gray-700 px-2 py-0.5 rounded-sm text-xs">
                                   {tag}
                                 </span>

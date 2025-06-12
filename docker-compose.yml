@@ -1,49 +1,64 @@
 version: '3.8'
 
 services:
-  frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile.frontend
-      args:
-        NEXT_PUBLIC_API_BASE_URL: http://backend:8080/api
+  postgres:
+    image: postgres:15
+    container_name: soma-pages_postgres_1
+    restart: always
+    environment:
+      POSTGRES_DB: somapages
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     ports:
-      - "3000:3000"
-    depends_on:
-      - backend
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d somapages"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-      args:
-        UID: ${UID:-1000}
-        GID: ${GID:-1000}
+    restart: always
     ports:
-      - "8080:8080"
-    volumes:
-      - ./backend:/workspace:cached
-      - m2_cache:/home/appuser/.m2
-    command: ./mvnw spring-boot:run
-    tty: true
+      - "8081:8080"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/somadev
-      - SPRING_DATASOURCE_USERNAME=soma
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/somapages
+      - SPRING_DATASOURCE_USERNAME=user
       - SPRING_DATASOURCE_PASSWORD=password
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
-  postgres:
-    image: postgres:15
-    environment:
-      - POSTGRES_DB=somadev
-      - POSTGRES_USER=soma
-      - POSTGRES_PASSWORD=password
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    restart: always
     ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - "3000:3000"
+    environment:
+      - API_BASE_URL_INTERNAL=http://backend:8080/api
+      - NEXT_PUBLIC_API_BASE_URL=/api/proxy
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 volumes:
-  m2_cache:
-  postgres_data: 
+  postgres_data:
+  m2_cache: 
