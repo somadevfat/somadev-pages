@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.soma.backend.dto.ContentCreateRequestDto;
 import com.soma.backend.dto.ContentDto;
+import com.soma.backend.dto.ContentUpdateRequestDto;
 import com.soma.backend.service.ContentService;
 
 @RestController
@@ -45,20 +47,22 @@ public class ContentController {
     }
 
     @PostMapping("/{type}")
-    public ResponseEntity<ContentDto> createContent(@PathVariable String type, @RequestBody ContentDto contentDto) {
-        ContentDto createdContent = contentService.createContent(type, contentDto);
+    public ResponseEntity<ContentDto> createContent(@PathVariable String type, @RequestBody ContentCreateRequestDto createDto) {
+        ContentDto createdContent = contentService.createContent(type, createDto);
         return new ResponseEntity<>(createdContent, HttpStatus.CREATED);
     }
 
     @PutMapping("/{type}/{slug}")
-    public ResponseEntity<ContentDto> updateContent(@PathVariable String type, @PathVariable String slug, @RequestBody ContentDto contentDto) {
-        ContentDto updatedContent = contentService.updateContent(type, slug, contentDto);
+    public ResponseEntity<ContentDto> updateContent(@PathVariable String type, @PathVariable String slug, @RequestBody ContentUpdateRequestDto updateDto) {
+        ContentDto updatedContent = contentService.updateContent(type, slug, updateDto);
         return ResponseEntity.ok(updatedContent);
     }
 
     @DeleteMapping("/{type}/{slug}")
     public ResponseEntity<Void> deleteContent(@PathVariable String type, @PathVariable String slug) {
-        contentService.deleteContent(type, slug);
-        return ResponseEntity.noContent().build();
+        // This method is not implemented for file-based service yet
+        // contentService.deleteContent(type, slug);
+        // return ResponseEntity.noContent().build();
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 } 

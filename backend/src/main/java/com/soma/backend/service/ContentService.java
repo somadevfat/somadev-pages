@@ -1,13 +1,20 @@
 package com.soma.backend.service;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.soma.backend.dto.ContentCreateRequestDto;
 import com.soma.backend.dto.ContentDto;
+import com.soma.backend.dto.ContentUpdateRequestDto;
 import com.soma.backend.entity.Content;
 import com.soma.backend.exception.ResourceNotFoundException;
 import com.soma.backend.repository.ContentRepository;
@@ -16,17 +23,18 @@ import com.soma.backend.repository.ContentRepository;
 public class ContentService {
 
     private final ContentRepository contentRepository;
+    private final ObjectMapper objectMapper;
 
-    @Autowired
-    public ContentService(ContentRepository contentRepository) {
+    public ContentService(ContentRepository contentRepository, ObjectMapper objectMapper) {
         this.contentRepository = contentRepository;
+        this.objectMapper = objectMapper;
     }
 
     @Transactional(readOnly = true)
     public List<ContentDto> getContents(String type) {
-        // The 'type' parameter is ignored for now, as the entity doesn't have a type field.
+        // 'type' is not used yet, but can be added as a field in Content entity later
         return contentRepository.findAll().stream()
-                .map(this::mapToDto)
+                .map(this::toDto)
                 .collect(Collectors.toList());
     }
 
@@ -34,45 +42,69 @@ public class ContentService {
     public ContentDto getContentBySlug(String type, String slug) {
         Content content = contentRepository.findBySlug(slug)
                 .orElseThrow(() -> new ResourceNotFoundException("Content not found with slug: " + slug));
-        return mapToDto(content);
+        return toDto(content);
     }
 
     @Transactional
-    public ContentDto createContent(String type, ContentDto contentDto) {
-        Content content = mapToEntity(contentDto);
-        // The 'type' parameter is ignored for now.
-        Content newContent = contentRepository.save(content);
-        return mapToDto(newContent);
-    }
-
-    @Transactional
-    public ContentDto updateContent(String type, String slug, ContentDto contentDto) {
-        Content content = contentRepository.findBySlug(slug)
-                .orElseThrow(() -> new ResourceNotFoundException("Content not found with slug: " + slug));
-
-        content.setMetadata(contentDto.getMetadata());
-        content.setBody(contentDto.getBody());
-
-        Content updatedContent = contentRepository.save(content);
-        return mapToDto(updatedContent);
-    }
-
-    @Transactional
-    public void deleteContent(String type, String slug) {
-        Content content = contentRepository.findBySlug(slug)
-                .orElseThrow(() -> new ResourceNotFoundException("Content not found with slug: " + slug));
-        contentRepository.delete(content);
-    }
-
-    private ContentDto mapToDto(Content content) {
-        return new ContentDto(content.getSlug(), content.getMetadata(), content.getBody());
-    }
-
-    private Content mapToEntity(ContentDto contentDto) {
+    public ContentDto createContent(String type, ContentCreateRequestDto createDto) {
         Content content = new Content();
-        content.setSlug(contentDto.getSlug());
-        content.setMetadata(contentDto.getMetadata());
-        content.setBody(contentDto.getBody());
-        return content;
+        content.setSlug(createDto.getSlug());
+        content.setTitle(createDto.getTitle());
+        content.setContent(createDto.getContent());
+
+        Map<String, Object> metadataMap = new LinkedHashMap<>();
+        metadataMap.put("title", createDto.getTitle());
+        metadataMap.put("date", LocalDate.now().toString());
+        metadataMap.put("dateTime", java.time.LocalDateTime.now().toString());
+        metadataMap.put("summary", "This is a new article."); // Default summary
+
+        java.util.List<String> tags = createDto.getTags() != null ? createDto.getTags() : new ArrayList<>();
+        metadataMap.put("tags", tags);
+        
+        try {
+            content.setMetadata(objectMapper.writeValueAsString(metadataMap));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Error serializing metadata", e);
+        }
+
+        Content savedContent = contentRepository.save(content);
+        return toDto(savedContent);
+    }
+
+    @Transactional
+    public ContentDto updateContent(String type, String slug, ContentUpdateRequestDto updateDto) {
+        Content content = contentRepository.findBySlug(slug)
+                .orElseThrow(() -> new ResourceNotFoundException("Content not found with slug: " + slug));
+
+        content.setTitle(updateDto.getTitle());
+        content.setContent(updateDto.getContent());
+
+        try {
+            // The metadata is a string, so we need to deserialize it first.
+            Map<String, Object> metadataMap = objectMapper.readValue(content.getMetadata(), Map.class);
+            metadataMap.put("title", updateDto.getTitle());
+
+            // tags がリクエストに含まれていれば上書き
+            if (updateDto.getTags() != null) {
+                metadataMap.put("tags", updateDto.getTags());
+            }
+
+            // Serialize it back to a string to save.
+            content.setMetadata(objectMapper.writeValueAsString(metadataMap));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Error updating metadata", e);
+        }
+        
+        Content updatedContent = contentRepository.save(content);
+        return toDto(updatedContent);
+    }
+
+    private ContentDto toDto(Content content) {
+        try {
+            Map<String, Object> metadataMap = objectMapper.readValue(content.getMetadata(), Map.class);
+            return new ContentDto(content.getSlug(), metadataMap, content.getContent());
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Error deserializing metadata", e);
+        }
     }
 } 
