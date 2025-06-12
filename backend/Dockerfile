@@ -1,29 +1,21 @@
-# Use an official OpenJDK runtime as a parent image
-FROM openjdk:17-slim
+# ---- ビルドステージ ----
+FROM maven:3.9-eclipse-temurin-17-focal AS build
 
-# Add build arguments for user and group IDs
-ARG UID=1000
-ARG GID=1000
-
-# Set the working directory
+# アプリケーションのソースコードをコンテナにコピー
 WORKDIR /workspace
-
-# Copy all files first
 COPY . .
 
-# Now, create user and set all permissions at once
-RUN groupadd -g $GID -o appgroup && \
-    useradd -m -u $UID -g $GID -s /bin/sh appuser && \
-    chown -R appuser:appgroup /workspace
+# Mavenでアプリケーションをパッケージング（テストはスキップ）
+RUN mvn package -DskipTests
 
-# Switch to non-root user
-USER appuser
+# ---- 実行ステージ ----
+FROM eclipse-temurin:17-jre-focal
 
-# Run Maven to download dependencies
-RUN ./mvnw dependency:go-offline -B
+# ビルドステージから生成されたJARファイルをコピー
+COPY --from=build /workspace/target/*.jar app.jar
 
-# Expose the application port
+# ポート8080を開放
 EXPOSE 8080
 
-# Command to run the application
-CMD ["./mvnw", "spring-boot:run"] 
+# コンテナ起動時にJARファイルを実行
+ENTRYPOINT ["java","-jar","/app.jar"] 

@@ -1,8 +1,18 @@
 import { getContents } from '@/lib/api-client';
 import Link from 'next/link';
+import type { Content } from '@/types/content';
+
+export const dynamic = 'force-dynamic';
 
 export default async function ArticlesPage() {
-  const articles = await getContents('articles');
+  const articles: Content[] = await getContents('articles');
+
+  // 日付で降順にソート
+  const sortedArticles = articles.sort((a, b) => {
+    const dateA = new Date(a.metadata.date);
+    const dateB = new Date(b.metadata.date);
+    return dateB.getTime() - dateA.getTime();
+  });
 
   return (
     <div className="bg-white p-8 rounded-lg shadow-md">
@@ -23,10 +33,13 @@ export default async function ArticlesPage() {
                 Title
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Slug
+                Date
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Author
+                Tags
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Slug
               </th>
               <th scope="col" className="relative px-6 py-3">
                 <span className="sr-only">Edit</span>
@@ -34,11 +47,14 @@ export default async function ArticlesPage() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {articles.map((article) => (
+            {sortedArticles.map((article) => (
               <tr key={article.slug}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{article.title}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{article.metadata.title}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{article.metadata.date}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {article.metadata.tags?.join(', ')}
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{article.slug}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{article.metadata.author}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <Link href={`/admin/edit/${article.slug}`} className="text-indigo-600 hover:text-indigo-900">
                     Edit

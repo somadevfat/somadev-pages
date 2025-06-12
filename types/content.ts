@@ -1,8 +1,7 @@
-export interface Content {
+export type Content = {
   slug: string;
-  title: string;
-  content: string;
   metadata: {
     [key: string]: any;
   };
-} 
+  body: string;
+}; 

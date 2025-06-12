@@ -1,0 +1,44 @@
+# Stage 1: Build Stage
+FROM node:18-alpine AS build
+WORKDIR /app
+
+# ビルド時にAPI URLを受け取るための設定
+ARG NEXT_PUBLIC_API_BASE_URL=/api/proxy
+# ARG with default value ensures variable is defined at build time even if not provided via build args.
+ENV NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
+
+# package.jsonとlockファイルをコピー
+COPY package.json package-lock.json* ./
+
+# 依存関係をインストール
+RUN npm install
+
+# アプリケーションのソースコードをコピー
+COPY . .
+
+# Next.jsアプリケーションをビルド
+RUN npm run build
+
+# Stage 2: Production Stage
+FROM node:18-alpine
+WORKDIR /app
+
+# 環境変数をproductionに設定
+ENV NODE_ENV production
+
+# ビルドステージから必要なファイルをコピー
+COPY --from=build /app/public ./public
+COPY --from=build /app/.next ./.next
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/package.json ./package.json
+
+# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+# 【重要】contentディレクトリをコピーする
+# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+COPY --from=build /app/content ./content
+
+# ポート3000を公開
+EXPOSE 3000
+
+# アプリケーションを起動
+CMD ["npm", "start"] 
