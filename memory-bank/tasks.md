@@ -250,6 +250,85 @@
     - 元のリポジトリのフロントエンドが、新しいバックエンドリポジトリを参照するように設定が更新される。
 - **ステータス:** 未着手
 
+### 🎟️ チケット D-01.1: ビルドエラー・Linter警告の解消
+
+- **担当:** General
+- **ブランチ:** `feature/D-01.1-fix-build-and-lint`
+- **説明:** `next.config.ts` の `ignoreBuildErrors` / `ignoreDuringBuilds` を無効にし、`npm run build` で出力される TypeScript エラー・ESLint 警告をすべて解消する。
+- **Output:**
+    - `npm run build` がエラー・警告ゼロで完了する。
+    - 本番デプロイでビルドが失敗しないことを CI 上で確認。
+- **ステータス:** 未着手
+
+### 🎟️ チケット D-01.2: 環境変数の本番設定
+
+- **担当:** General
+- **ブランチ:** `feature/D-01.2-setup-env-vars`
+- **説明:** `docker-compose.prod.yml` と Vercel 設定画面に必要な環境変数を登録し、値が正しく読み込まれることを確認する。
+- **Output:**
+    - サーバー上 `.env` に `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD` が設定される。
+    - Vercel に `NEXT_PUBLIC_API_BASE_URL`, `API_BASE_URL_INTERNAL` が設定される。
+    - `.env*` ファイルが `.gitignore` によって Git 管理外であることを確認。
+- **ステータス:** 未着手
+
+### 🎟️ チケット D-01.3: DB データ永続化とバックアップ計画
+
+- **担当:** DevOps
+- **ブランチ:** `feature/D-01.3-db-persistence-policy`
+- **説明:** `docker-compose.prod.yml` のボリューム設定を確認し、データ消失リスクを低減するバックアップ手順を策定する。
+- **Output:**
+    - 定期バックアップスクリプトまたは手順書 (`docs/DB_BACKUP.md`) が作成される。
+    - 本番サーバーで `docker volume inspect` で永続化設定が確認できる。
+- **ステータス:** 未着手
+
+### 🎟️ チケット D-01.4: セキュアなパスワードと秘密情報管理
+
+- **担当:** DevOps
+- **ブランチ:** `feature/D-01.4-secure-credentials`
+- **説明:** 開発用の簡易パスワードを排除し、本番用に強力なパスワード・シークレット管理を導入する。
+- **Output:**
+    - 12 文字以上のランダムパスワードが生成・適用される。
+    - すべてのシークレットが Git から除外され、サーバー側シークレットストアで管理される。
+- **ステータス:** 未着手
+
+### 🎟️ チケット D-01.5: DB ポートのファイアウォール設定
+
+- **担当:** DevOps
+- **ブランチ:** `feature/D-01.5-firewall-db-port`
+- **説明:** Oracle Cloud のセキュリティ・リストで `5432` ポートを外部公開しない設定を適用する。
+- **Output:**
+    - `5432` ポートが外部からアクセス不可であることを `nmap` などで確認。
+- **ステータス:** 未着手
+
+### 🎟️ チケット D-01.6: API プロキシ動作確認
+
+- **担当:** Frontend
+- **ブランチ:** `feature/D-01.6-verify-api-proxy`
+- **説明:** Vercel 上で `/api/proxy/...` がバックエンドに正しくルーティングされることを確認し、必要に応じて `app/api/proxy/[...path]/route.ts` を修正する。
+- **Output:**
+    - ブラウザ DevTools で API コールが `2xx` で返るスクリーンショットを添付。
+- **ステータス:** 未着手
+
+### 🎟️ チケット D-01.7: 本番用 Docker イメージビルド
+
+- **担当:** Backend
+- **ブランチ:** `feature/D-01.7-build-prod-image`
+- **説明:** `docker-compose.prod.yml` で参照する `somapages/backend:latest` イメージをビルドし、Docker Hub もしくは自前レジストリへプッシュする。
+- **Output:**
+    - `somapages/backend:latest` がリモートレジストリで利用可能。
+    - `docker-compose.prod.yml` の `image:` 指定がタグ付きイメージを参照。
+- **ステータス:** 未着手
+
+### 🎟️ チケット D-01.8: ヘルスチェック監視とアラート
+
+- **担当:** DevOps
+- **ブランチ:** `feature/D-01.8-healthcheck-monitor`
+- **説明:** `docker-compose ps` のヘルスチェック結果を監視し、`unhealthy` になった場合に自動再起動または通知を行う仕組みを導入する。
+- **Output:**
+    - 監視スクリプトまたは外部モニタリングサービス連携 (例: UptimeRobot)。
+    - `backend` コンテナが `healthy` を維持できることを確認。
+- **ステータス:** 未着手
+
 ---
 
 ## 🎯 新規機能追加: タグ入力＆自動日時メタデータ (Level 3)
