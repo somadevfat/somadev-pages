@@ -32,22 +32,22 @@ public class ContentService {
 
     @Transactional(readOnly = true)
     public List<ContentDto> getContents(String type) {
-        // 'type' is not used yet, but can be added as a field in Content entity later
-        return contentRepository.findAll().stream()
+        return contentRepository.findAllByType(type).stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public ContentDto getContentBySlug(String type, String slug) {
-        Content content = contentRepository.findBySlug(slug)
-                .orElseThrow(() -> new ResourceNotFoundException("Content not found with slug: " + slug));
+        Content content = contentRepository.findByTypeAndSlug(type, slug)
+                .orElseThrow(() -> new ResourceNotFoundException("Content not found with type: " + type + " slug: " + slug));
         return toDto(content);
     }
 
     @Transactional
     public ContentDto createContent(String type, ContentCreateRequestDto createDto) {
         Content content = new Content();
+        content.setType(type);
         content.setSlug(createDto.getSlug());
         content.setTitle(createDto.getTitle());
         content.setContent(createDto.getContent());
@@ -73,8 +73,8 @@ public class ContentService {
 
     @Transactional
     public ContentDto updateContent(String type, String slug, ContentUpdateRequestDto updateDto) {
-        Content content = contentRepository.findBySlug(slug)
-                .orElseThrow(() -> new ResourceNotFoundException("Content not found with slug: " + slug));
+        Content content = contentRepository.findByTypeAndSlug(type, slug)
+                .orElseThrow(() -> new ResourceNotFoundException("Content not found with type: " + type + " slug: " + slug));
 
         content.setTitle(updateDto.getTitle());
         content.setContent(updateDto.getContent());
@@ -97,6 +97,14 @@ public class ContentService {
         
         Content updatedContent = contentRepository.save(content);
         return toDto(updatedContent);
+    }
+
+    @Transactional
+    public void deleteContent(String type, String slug) {
+        // ensure existence for proper 404 handling
+        Content content = contentRepository.findByTypeAndSlug(type, slug)
+                .orElseThrow(() -> new ResourceNotFoundException("Content not found with type: " + type + " slug: " + slug));
+        contentRepository.delete(content);
     }
 
     private ContentDto toDto(Content content) {
