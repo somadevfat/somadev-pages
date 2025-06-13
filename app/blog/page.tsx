@@ -6,6 +6,8 @@ export const metadata = {
   description: 'Read my thoughts on software development, design, and more.',
 };
 
+export const dynamic = 'force-dynamic';
+
 export default async function ArticlesPage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
   const allArticles: ArticleData[] = await getContents('articles');
   const page = typeof searchParams?.page === 'string' ? parseInt(searchParams.page, 10) : 1;
