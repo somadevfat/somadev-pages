@@ -17,6 +17,7 @@ export default function ArticleEditorForm({ article }: ArticleEditorFormProps) {
   const [slug, setSlug] = useState('');
   const [markdown, setMarkdown] = useState('');
   const [tags, setTags] = useState<string[]>([]);
+  const [excerpt, setExcerpt] = useState('');
   const [allTags, setAllTags] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -29,6 +30,9 @@ export default function ArticleEditorForm({ article }: ArticleEditorFormProps) {
       setMarkdown(article.body);
       if (Array.isArray(article.metadata.tags)) {
         setTags(article.metadata.tags as string[]);
+      }
+      if (article.metadata.excerpt) {
+        setExcerpt(article.metadata.excerpt as string);
       }
     }
   }, [article]);
@@ -108,6 +112,7 @@ export default function ArticleEditorForm({ article }: ArticleEditorFormProps) {
           onChange={(e) => setTitle(e.target.value)}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm text-gray-900"
           placeholder="Your Post Title"
+          data-testid="title-input"
         />
       </div>
       
@@ -125,6 +130,22 @@ export default function ArticleEditorForm({ article }: ArticleEditorFormProps) {
           placeholder="your-post-slug"
           disabled={!!article} // Disable slug editing for existing articles
           required={!article} // New article creation requires slug
+          data-testid="slug-input"
+        />
+      </div>
+      
+      <div>
+        <label htmlFor="excerpt" className="block text-sm font-medium text-gray-700">
+          Excerpt
+        </label>
+        <textarea
+          id="excerpt"
+          data-testid="excerpt-input"
+          value={excerpt}
+          onChange={(e) => setExcerpt(e.target.value)}
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm text-gray-900"
+          rows={3}
+          placeholder="Short summary..."
         />
       </div>
       
@@ -170,6 +191,8 @@ export default function ArticleEditorForm({ article }: ArticleEditorFormProps) {
             onChange={(val) => setMarkdown(val || '')}
             height={400}
             preview="edit"
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            textareaProps={{ 'data-testid': 'content-textarea' } as any}
           />
         </div>
       </div>
@@ -180,6 +203,7 @@ export default function ArticleEditorForm({ article }: ArticleEditorFormProps) {
       <div className="flex justify-end">
         <button
           type="submit"
+          data-testid="save-button"
           className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50"
           disabled={isSubmitting}
         >
