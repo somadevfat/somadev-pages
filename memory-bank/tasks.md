@@ -276,6 +276,82 @@
     - 管理画面から記事を作成 → DBに保存される → 記事一覧に表示される → 記事を編集 → DB内容が更新される → 記事を削除 → DBから削除される、という一連の動作が正常に完了する。
 - **ステータス:** 進行中 (BLOCKER: `I-01.1`の完了待ち)
 
+### 📝 Level 3 計画ドキュメント (I-01: 最終統合テスト)
+
+#### 0. Branch
+- ブランチ: `feature/I-01-e2e-integration`
+
+#### 1. Requirements Analysis
+- フロントエンド(Next.js) とバックエンド(Spring Boot) を Docker Compose で同時起動し、管理画面から記事 CRUD が問題なく動作することを確認する。
+- API プロキシ (`/api/proxy/...`) がフロントエンド → バックエンドへ正しくルーティングされること。
+- テストは **Playwright** でブラウザ E2E、自動化スクリプトを GitHub Actions で実行可能にする。
+
+#### 2. Components Affected
+- `docker-compose.yml` (E2E 専用 profile 追加)  
+- `app/api/proxy/[...path]/route.ts` (必要に応じ修正)  
+- `tests/e2e/*` (Playwright テストスイート)  
+- `.github/workflows/ci.yml` (E2E ジョブ追加)
+
+#### 3. Implementation Strategy
+1. **Environment**: Docker Compose で backend:8080、frontend:3000 を起動後、Playwright コンテナで E2E 実行
+2. **Playwright Setup**: `npx playwright install` → `playwright.config.ts` を作成し、Chromium ヘッドレスで実行
+3. **Test Scenarios**:
+   - 記事一覧が 200 OK で表示される
+   - 「新規作成」→ 記事フォームに入力→ 保存 → 一覧に表示
+   - 記事をクリック→ 編集→ タイトル変更→ 保存 → 一覧に反映
+   - 記事削除→ モーダル確認→ 一覧から消える
+4. **CI**: GitHub Actions 上で docker compose + Playwright を起動し、E2E ジョブを追加
+
+#### 4. Detailed Steps & Checklist
+- [ ] Docker Compose に `e2e` サービス (Playwright) 追加
+- [ ] `playwright.config.ts` 作成
+- [ ] 記事 CRUD の E2E テストスクリプト実装
+- [ ] `package.json` に `npm run e2e` スクリプト追加
+- [ ] `.github/workflows/ci.yml` に E2E ステップ追加
+- [ ] ローカル `npm run e2e` がグリーン
+- [ ] GitHub Actions でワークフローが成功
+
+#### 5. Potential Challenges
+- コンテナ間ネットワーク遅延によるタイムアウト → Playwright `timeout` 拡大
+- CSRF / CORS 問題 → フロント↔バック間は同一 docker ネットワークで解決
+
+#### 6. Creative Phase Components
+- UI は既存のまま、Creative フェーズ不要
+
+⏭️ NEXT MODE: IMPLEMENT MODE
+
+### 📝 Level 2 計画ドキュメント (I-01.2: UI セレクタ整合)
+
+#### 0. Overview
+Playwright E2E テストが期待する `data-testid` と実際の管理画面 UI コンポーネントが不一致のため、画面側へテスト用セレクタを追加しテキストを統一する。
+
+#### 1. Files to Modify
+- `app/admin/articles/page.tsx` (一覧ページ)  
+- `app/admin/new/page.tsx` + `components/ArticleEditorForm.tsx` (新規作成フォーム)  
+- `app/admin/edit/[slug]/page.tsx` (編集ページがある場合)  
+- `components/TagInput.tsx`（タグ入力のテスト用セレクタ）  
+- `tests/e2e/article-crud.spec.ts`（ロケータを data-testid ベースに統一）
+
+#### 2. Implementation Steps
+1. 各操作ボタン・入力・モーダルに `data-testid` 属性を付与
+   - 例: 新規ボタン `data-testid="new-article-button"`
+   - 編集 `data-testid="edit-{slug}"`
+   - 削除 `data-testid="delete-{slug}"`
+   - 入力欄 `title-input`, `slug-input`, `content-textarea`, `tag-input`
+2. UI 文言を Playwright 側に合わせる or テスト側をセレクタ中心にリファクタ
+3. Playwright スクリプトを `getByTestId` (`[data-testid="..."]`) へ変更し可読性を向上
+4. `docker-compose.e2e.yml` で再実行 → テストがグリーンになるまで微調整
+
+#### 3. Potential Challenges
+- Next.js サーバ再ビルド待ちでタイムアウト → Playwright `expect(...).toBeVisible({ timeout: 10000 })`
+- スラッグ生成ロジックが重複し slug が衝突 → テスト用 slug を固定し、テスト開始時に既存記事を削除
+
+#### 4. Testing Strategy
+- ローカル: `npm run test:e2e` で緑になることを確認
+- CI: GitHub Actions ワークフローで E2E ジョブ成功
+
+⏭️ NEXT MODE: IMPLEMENT MODE
+
 ---
 
 ## ✅ 完了済みタスク (I-01で実施)
