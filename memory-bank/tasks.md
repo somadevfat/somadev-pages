@@ -176,6 +176,82 @@
     - APIを叩くと、DBに基づいた内容が返される。
 - **ステータス:** 完了 (ただし、`ContentService`がDBではなくファイルシステムを参照する実装になっており、リファクタリングが必要)
 
+####  📝 Level 3 計画ドキュメント (I-01.1)
+
+##### 0. Branch Strategy
+- **develop から最新を取得し、作業ブランチを同期する**
+  ```bash
+  # develop を最新化
+  git checkout develop
+  git pull origin develop
+
+  # 作業ブランチを作成／切り替え
+  git checkout -B feature/I-01-final-integration-test
+
+  # develop の変更を取り込み（既にブランチが存在する場合はリベース推奨）
+  git pull --rebase origin develop
+
+  # 競合を解消して push
+  git push -u origin feature/I-01-final-integration-test
+  ```
+
+##### 1. Requirements Analysis
+- API `/api/contents` が **PostgreSQL** を介して完全 CRUD (Create / Read / Update / Delete) 可能であること。
+- `type` (articles, quizzes など) ごとにコンテンツを分類・取得できること。
+- 不足している **Delete** 処理を実装し、テストで保証すること。
+- application.properties に **PostgreSQL** 接続設定を追加し、環境変数上書きも可能とすること。
+- **ローカル開発** 用に H2 Memory DB プロファイルを用意し、迅速な起動を担保すること。
+
+##### 2. Components Affected
+- `backend/src/main/java/com/soma/backend/entity/Content.java`
+- `backend/src/main/java/com/soma/backend/repository/ContentRepository.java`
+- `backend/src/main/java/com/soma/backend/service/ContentService.java`
+- `backend/src/main/java/com/soma/backend/controller/ContentController.java`
+- `backend/src/main/resources/application.properties`
+- `backend/src/test/java/com/soma/backend` (新規 Integration Test)
+
+##### 3. Architecture Considerations
+- `Content` エンティティに `type` カラム (`VARCHAR`) を追加し、`slug` と複合一意制約を検討（将来の拡張用）。
+- Spring Data JPA を活用し、`findAllByType`・`findByTypeAndSlug`・`deleteByTypeAndSlug` を Repository に追加。
+- Controller → Service → Repository まで `type` をパラメータとして受け渡す設計を統一。
+- DB スキーマ更新は `spring.jpa.hibernate.ddl-auto=update` で自動マイグレーションに任せる。
+
+##### 4. Implementation Strategy
+1. **Git ブランチ同期 (前述)**
+2. **Entity 変更**: `type` フィールド追加 + 既存レコードのデフォルト値 `articles` を設定。
+3. **Repository 拡張**: 上記 3 で述べたメソッドを追加。
+4. **Service 改修**:
+   - 取得系メソッドで `type` でフィルタリング。
+   - `deleteContent(type, slug)` を新規実装。
+5. **Controller 改修**: DELETE エンドポイント実装。
+6. **application.properties** に Postgres 接続設定 (`spring.datasource.*`) を追記し、`@Profile("local")` 用に H2 設定を分離。
+7. **統合テスト**: Testcontainers + Postgres で CRUD 動作を検証。
+
+##### 5. Detailed Steps & Checklist
+- [ ] ブランチを develop から最新化
+- [ ] `Content` エンティティに `type` 追加
+- [ ] `ContentRepository` にフィルタ・削除メソッド追加
+- [ ] `ContentService` で `type` フィルタ & `deleteContent` 実装
+- [ ] `ContentController` に DELETE 実装
+- [ ] `application.properties` に Postgres 接続設定追加
+- [ ] `application-local.properties` (H2) 追加
+- [ ] Integration Test 作成 (`ContentServiceIntegrationTest`)
+- [ ] `docker-compose up -d` で手動動作確認
+
+##### 6. Dependencies
+- `org.testcontainers:junit-jupiter` (テスト用)
+- `org.testcontainers:postgresql`
+
+##### 7. Challenges & Mitigations
+- **スキーマ変更による既存データの整合性**: ローカル環境で DB を再構築するか、`ALTER TABLE` を手動実行。
+- **Testcontainers の起動コスト**: `@Testcontainers` + `@DynamicPropertySource` で同一コンテナをテストクラス間共有。
+- **複合一意制約**: まずは `slug` 単体制約を維持し、将来の拡張時に対応。
+
+##### 8. Creative Phase Components
+- 今回は UI/UX やアルゴリズムの大規模設計は不要のため **CREATIVE フェーズは不要**。
+
+⏭️ NEXT MODE: IMPLEMENT MODE
+
 ### 🎟️ チケット FE-04: フロントエンドのAPI連携 (マージタスク)
 
 - **担当:** Frontend

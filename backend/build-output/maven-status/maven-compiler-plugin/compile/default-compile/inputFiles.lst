@@ -1,0 +1,12 @@
+/home/soma/soma-pages/backend/src/main/java/com/soma/backend/BackendApplication.java
+/home/soma/soma-pages/backend/src/main/java/com/soma/backend/config/ContentStorageProperties.java
+/home/soma/soma-pages/backend/src/main/java/com/soma/backend/config/WebConfig.java
+/home/soma/soma-pages/backend/src/main/java/com/soma/backend/controller/ContentController.java
+/home/soma/soma-pages/backend/src/main/java/com/soma/backend/dto/ContentCreateRequestDto.java
+/home/soma/soma-pages/backend/src/main/java/com/soma/backend/dto/ContentDto.java
+/home/soma/soma-pages/backend/src/main/java/com/soma/backend/dto/ContentUpdateRequestDto.java
+/home/soma/soma-pages/backend/src/main/java/com/soma/backend/entity/Content.java
+/home/soma/soma-pages/backend/src/main/java/com/soma/backend/exception/ResourceNotFoundException.java
+/home/soma/soma-pages/backend/src/main/java/com/soma/backend/repository/ContentRepository.java
+/home/soma/soma-pages/backend/src/main/java/com/soma/backend/service/ContentService.java
+/home/soma/soma-pages/backend/src/main/java/com/soma/backend/service/FileStorageService.java

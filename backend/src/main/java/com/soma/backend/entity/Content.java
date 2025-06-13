@@ -35,4 +35,7 @@ public class Content {
 
     @Column(columnDefinition = "TEXT")
     private String metadata;
+
+    @Column
+    private String type;
 } 
