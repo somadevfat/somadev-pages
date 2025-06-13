@@ -60,9 +60,7 @@ public class ContentController {
 
     @DeleteMapping("/{type}/{slug}")
     public ResponseEntity<Void> deleteContent(@PathVariable String type, @PathVariable String slug) {
-        // This method is not implemented for file-based service yet
-        // contentService.deleteContent(type, slug);
-        // return ResponseEntity.noContent().build();
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+        contentService.deleteContent(type, slug);
+        return ResponseEntity.noContent().build();
     }
 } 
