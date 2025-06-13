@@ -26,4 +26,12 @@ export async function PUT(req: NextRequest, { params }: { params: { path: string
   const backendRes = await fetch(url, { method: 'PUT', body, headers: { 'Content-Type': 'application/json' } } as any);
   const data = await backendRes.text();
   return new NextResponse(data, { status: backendRes.status, headers: { 'Content-Type': backendRes.headers.get('Content-Type') || 'application/json' } });
+}
+
+export async function DELETE(req: NextRequest, { params }: { params: { path: string[] } }) {
+  const targetPath = params.path.join('/')
+  const url = `${API_BASE}/${targetPath}`;
+  const backendRes = await fetch(url, { method: 'DELETE', headers: { 'Content-Type': 'application/json' } } as any);
+  const data = await backendRes.text();
+  return new NextResponse(data, { status: backendRes.status, headers: { 'Content-Type': backendRes.headers.get('Content-Type') || 'application/json' } });
 } 
