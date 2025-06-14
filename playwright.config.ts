@@ -1,5 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const isInsideCompose = !!process.env.PLAYWRIGHT_BASE_URL;
+
 export default defineConfig({
   testDir: './tests/e2e',
   fullyParallel: true,
@@ -20,10 +22,14 @@ export default defineConfig({
     },
   ],
 
-  webServer: {
-    command: 'docker compose -f docker-compose.e2e.yml up --build backend frontend',
-    url: 'http://localhost:3001',
-    timeout: 240_000,
-    reuseExistingServer: true,
-  },
+  ...(isInsideCompose
+    ? {}
+    : {
+        webServer: {
+          command: 'docker compose -f docker-compose.e2e.yml up --build backend frontend',
+          url: 'http://localhost:3001',
+          timeout: 240_000,
+          reuseExistingServer: true,
+        },
+      }),
 }); 
