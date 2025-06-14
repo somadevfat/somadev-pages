@@ -1,6 +1,15 @@
 import { test, expect } from '@playwright/test';
 
+const adminEmail = process.env.E2E_TEST_USER_EMAIL;
+const adminPassword = process.env.E2E_TEST_USER_PASSWORD;
+
 test.describe('Authentication and Authorization', () => {
+
+  test.beforeAll(() => {
+    if (!adminEmail || !adminPassword) {
+      throw new Error('E2E_TEST_USER_EMAIL and E2E_TEST_USER_PASSWORD environment variables must be set.');
+    }
+  });
 
   test('should redirect to login page when trying to access admin area without authentication', async ({ page }) => {
     await page.goto('/admin/articles');
@@ -13,8 +22,8 @@ test.describe('Authentication and Authorization', () => {
   test('should allow access to admin area after login and then logout successfully', async ({ page }) => {
     // 1. Login
     await page.goto('/login');
-    await page.fill('[data-testid="email-input"]', 'admin@example.com');
-    await page.fill('[data-testid="password-input"]', 'password');
+    await page.fill('[data-testid="email-input"]', adminEmail);
+    await page.fill('[data-testid="password-input"]', adminPassword);
     await page.click('[data-testid="login-button"]');
 
     // 2. Verify access to admin area
@@ -37,8 +46,8 @@ test.describe('Authentication and Authorization', () => {
   test('should redirect to admin page when a logged-in user tries to access login page', async ({ page }) => {
     // 1. Login first
     await page.goto('/login');
-    await page.fill('[data-testid="email-input"]', 'admin@example.com');
-    await page.fill('[data-testid="password-input"]', 'password');
+    await page.fill('[data-testid="email-input"]', adminEmail);
+    await page.fill('[data-testid="password-input"]', adminPassword);
     await page.click('[data-testid="login-button"]');
     await page.waitForURL('**/admin/articles');
 

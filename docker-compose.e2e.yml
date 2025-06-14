@@ -54,4 +54,6 @@ services:
         condition: service_healthy
     environment:
       - CI=true
-      - PLAYWRIGHT_BASE_URL=http://frontend:3000 
+      - PLAYWRIGHT_BASE_URL=http://frontend:3000
+      - E2E_TEST_USER_EMAIL
+      - E2E_TEST_USER_PASSWORD 

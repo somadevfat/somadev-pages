@@ -2,6 +2,9 @@ import { test, expect } from '@playwright/test';
 
 test.setTimeout(60000);
 
+const adminEmail = process.env.E2E_TEST_USER_EMAIL;
+const adminPassword = process.env.E2E_TEST_USER_PASSWORD;
+
 test.describe.serial('Article CRUD Operations', () => {
   const testArticle = {
     title: 'E2E Test Article',
@@ -11,14 +14,20 @@ test.describe.serial('Article CRUD Operations', () => {
     excerpt: 'Test excerpt for E2E testing'
   };
 
+  test.beforeAll(() => {
+    if (!adminEmail || !adminPassword) {
+      throw new Error('E2E_TEST_USER_EMAIL and E2E_TEST_USER_PASSWORD environment variables must be set.');
+    }
+  });
+
   test.beforeEach(async ({ page }) => {
     // Always start from login page to ensure authenticated session
     await page.goto('/login');
 
     // If already logged in, /login might redirect immediately
     if (page.url().includes('/login')) {
-      await page.fill('[data-testid="email-input"]', 'admin@example.com');
-      await page.fill('[data-testid="password-input"]', 'password');
+      await page.fill('[data-testid="email-input"]', adminEmail);
+      await page.fill('[data-testid="password-input"]', adminPassword);
       await page.click('[data-testid="login-button"]');
     }
 

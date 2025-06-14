@@ -81,6 +81,9 @@ jobs:
       uses: docker/setup-buildx-action@v3
     
     - name: Run E2E tests
+      env:
+        E2E_TEST_USER_EMAIL: ${{ secrets.E2E_TEST_USER_EMAIL }}
+        E2E_TEST_USER_PASSWORD: ${{ secrets.E2E_TEST_USER_PASSWORD }}
       run: npm run test:e2e:docker
     
     - name: Upload Playwright report
