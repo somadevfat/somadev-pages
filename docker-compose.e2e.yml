@@ -40,7 +40,7 @@ services:
       start_period: 40s
 
   e2e-tests:
-    image: mcr.microsoft.com/playwright:v1.40.0-focal
+    image: mcr.microsoft.com/playwright:v1.53.0-focal
     working_dir: /app
     volumes:
       - .:/app
