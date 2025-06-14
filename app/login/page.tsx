@@ -1,35 +1,29 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { login } from "@/lib/api-client";
+import Cookies from 'js-cookie';
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("admin@example.com");
   const [password, setPassword] = useState("password");
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    setIsLoading(true);
+
     try {
-      const res = await fetch("/api/proxy/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-      if (!res.ok) {
-        throw new Error("Invalid credentials");
-      }
-      const data = await res.json();
-      // 保存: Cookie にトークンを保存 (有効期限1日)
-      document.cookie = `token=${data.token}; path=/; max-age=86400`;
+      const { token } = await login({ email, password });
+      Cookies.set('token', token, { expires: 1, path: '/', secure: process.env.NODE_ENV === 'production' });
       router.replace("/admin/articles");
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("Login failed");
-      }
+      setError(err instanceof Error ? err.message : "An unknown error occurred");
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -56,6 +50,7 @@ export default function LoginPage() {
             onChange={(e) => setEmail(e.target.value)}
             className="mt-1 block w-full border border-gray-300 rounded-md p-2"
             data-testid="email-input"
+            disabled={isLoading}
           />
         </div>
         <div className="space-y-1">
@@ -69,14 +64,16 @@ export default function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
             className="mt-1 block w-full border border-gray-300 rounded-md p-2"
             data-testid="password-input"
+            disabled={isLoading}
           />
         </div>
         <button
           type="submit"
           data-testid="login-button"
-          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded"
+          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded disabled:bg-indigo-300"
+          disabled={isLoading}
         >
-          Login
+          {isLoading ? 'Logging in...' : 'Login'}
         </button>
       </form>
     </div>
