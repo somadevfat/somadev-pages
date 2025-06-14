@@ -10,12 +10,12 @@ export default function ArticlesPage() {
   useEffect(() => {
     (async () => {
       const data = await getContents("articles");
-      // 日付で降順にソート
+  // 日付で降順にソート
       setArticles(
         data.sort((a, b) => {
-          const dateA = new Date(a.metadata.date);
-          const dateB = new Date(b.metadata.date);
-          return dateB.getTime() - dateA.getTime();
+    const dateA = new Date(a.metadata.date);
+    const dateB = new Date(b.metadata.date);
+    return dateB.getTime() - dateA.getTime();
         })
       );
     })();
