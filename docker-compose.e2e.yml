@@ -1,4 +1,4 @@
-version: '3.8'
+# Docker Compose file for E2E tests (version key removed as Compose v2 ignores it)
 
 services:
   backend:
@@ -40,7 +40,7 @@ services:
       start_period: 40s
 
   e2e-tests:
-    image: mcr.microsoft.com/playwright:v1.53.0-focal
+    image: mcr.microsoft.com/playwright:v1.53.0-jammy
     working_dir: /app
     volumes:
       - .:/app
