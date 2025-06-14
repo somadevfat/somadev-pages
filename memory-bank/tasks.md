@@ -571,3 +571,38 @@ Playwright E2E テストが期待する `data-testid` と実際の管理画面 U
 ---
 
 ⏭️ NEXT MODE: IMPLEMENT MODE
+
+## フェーズ 3.5: 認証機能追加 (Auth Phase)
+
+### 🎟️ チケット BE-06: 認証 API の実装
+- **担当:** Backend
+- **ブランチ:** `feature/BE-06-auth-api`
+- **説明:** Spring Security + JWT を用いて login / refresh / user-info エンドポイントを実装し、Admin UI と連携できるトークンを発行する。
+- **Output:**
+  - `AuthController` (`/api/auth/login`, `/api/auth/refresh`)
+  - `User` エンティティ & `UserRepository`
+  - `PasswordEncoder` に `BCrypt`
+  - JWT 署名鍵を `application.properties` で管理（Secrets 上書き可）。
+  - 統合テスト：正しい資格情報で 200 / 誤認証で 401 を確認。
+
+### 🎟️ チケット FE-08: ログイン画面の実装
+- **担当:** Frontend
+- **ブランチ:** `feature/FE-08-login-page`
+- **説明:** Next.js App Router で `/login` ルートを作成し、メール + パスワードでログインできるフォームを実装。成功時に JWT を cookie に保存する。
+- **Output:**
+  - `app/login/page.tsx` + `LoginForm` コンポーネント
+  - `lib/auth-client.ts` で `login()` を実装
+  - 成功時に `/admin` へリダイレクト、失敗時にエラーメッセージ表示。
+
+### 🎟️ チケット FE-09: 管理画面ルートガード
+- **担当:** Frontend
+- **ブランチ:** `feature/FE-09-admin-route-guard`
+- **説明:** App Router の `middleware.ts` で `/admin/**` へのアクセスを検査し、JWT が無い場合 `/login` へリダイレクト。
+- **Output:**
+  - `middleware.ts` に認可ロジック追加
+  - E2E テストに「未ログイン時にリダイレクトされる」シナリオを追加。
+
+### TODO Checklist (Auth Phase)
+- [ ] BE-06: JWT 認証 API
+- [ ] FE-08: ログイン画面
+- [ ] FE-09: 管理画面ルートガード
