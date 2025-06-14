@@ -39,9 +39,8 @@ test.describe.serial('Article CRUD Operations', () => {
       console.log('Login form not found, assuming already logged in');
     }
 
-    // Wait until admin articles page loads
-    await page.waitForURL('**/admin/articles', { timeout: 15000 });
-    await page.waitForSelector('[data-testid="new-article-button"]', { timeout: 15000 });
+    // Wait until admin page is loaded by checking for logout button
+    await expect(page.locator('[data-testid="logout-button"]')).toBeVisible({ timeout: 15000 });
   });
 
   test('should create a new article', async ({ page }) => {

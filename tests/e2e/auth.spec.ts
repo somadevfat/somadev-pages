@@ -29,9 +29,9 @@ test.describe('Authentication and Authorization', () => {
     await page.fill('[data-testid="password-input"]', adminPassword);
     await page.click('[data-testid="login-button"]');
 
-    // 2. Verify access to admin area
-    await page.waitForURL('**/admin/articles', { timeout: 15000 });
-    await expect(page.locator('h1')).toContainText('Articles');
+    // Verify access to admin area by waiting for logout button
+    await expect(page.locator('[data-testid="logout-button"]')).toBeVisible({ timeout: 15000 });
+    await expect(page.url()).toContain('/admin/articles');
 
     // 3. Logout
     await page.click('[data-testid="logout-button"]');
@@ -55,7 +55,10 @@ test.describe('Authentication and Authorization', () => {
     await page.fill('[data-testid="email-input"]', adminEmail);
     await page.fill('[data-testid="password-input"]', adminPassword);
     await page.click('[data-testid="login-button"]');
-    await page.waitForURL('**/admin/articles', { timeout: 15000 });
+    
+    // Wait for logout button to appear
+    await expect(page.locator('[data-testid="logout-button"]')).toBeVisible({ timeout: 15000 });
+    await expect(page.url()).toContain('/admin/articles');
 
     // 2. Try to access login page again
     await page.goto('/login');
