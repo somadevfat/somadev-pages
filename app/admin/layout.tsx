@@ -1,10 +1,20 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const router = useRouter();
+
+  useEffect(() => {
+    const hasToken = document.cookie.split(';').some((c) => c.trim().startsWith('token='));
+    if (!hasToken) {
+      router.replace('/login');
+    }
+  }, [router]);
 
   const Sidebar = (
     <aside className={`fixed inset-y-0 left-0 z-30 w-64 bg-gray-800 text-white flex flex-col transform transition-transform duration-200 md:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:static md:inset-auto md:transform-none`}>        
