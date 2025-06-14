@@ -1,20 +1,19 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
+import Cookies from 'js-cookie';
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const router = useRouter();
 
-  useEffect(() => {
-    const hasToken = document.cookie.split(';').some((c) => c.trim().startsWith('token='));
-    if (!hasToken) {
-      router.replace('/login');
-    }
-  }, [router]);
+  const handleLogout = () => {
+    Cookies.remove('token', { path: '/' });
+    router.replace('/login');
+  };
 
   const Sidebar = (
     <aside className={`fixed inset-y-0 left-0 z-30 w-64 bg-gray-800 text-white flex flex-col transform transition-transform duration-200 md:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:static md:inset-auto md:transform-none`}>        
@@ -32,6 +31,15 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           New Post
         </Link>
       </nav>
+      <div className="p-4 border-t border-gray-700">
+        <button
+          onClick={handleLogout}
+          data-testid="logout-button"
+          className="w-full text-left px-4 py-2 rounded hover:bg-red-500 hover:text-white"
+        >
+          Logout
+        </button>
+      </div>
     </aside>
   );
 
