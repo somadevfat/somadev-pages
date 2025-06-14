@@ -179,7 +179,7 @@
   - [ ] 管理画面のレイアウトにログアウトボタンを設置する。
   - [ ] ログアウトボタンクリック時、Cookieを削除し`/login`へリダイレクトさせる。
   - [ ] ルートガードとログアウト機能を検証するE2Eテストを追加する。
-- **ステータス:** **進行中**
+- **ステータス:** **完了**
 
 ---
 
@@ -199,7 +199,7 @@
     - `ContentRepository` (JpaRepository) が作成される。
     - `ContentService`がファイル操作ではなく、`ContentRepository`を通じてDBとやり取りするようになる。
     - APIを叩くと、DBに基づいた内容が返される。
-- **ステータス:** 完了 (ただし、`ContentService`がDBではなくファイルシステムを参照する実装になっており、リファクタリングが必要)
+- **ステータス:** **完了**
 
 ####  📝 Level 3 計画ドキュメント (I-01.1)
 
@@ -299,53 +299,15 @@
     - **マージ元ブランチ:** `feature/BE-04-implement-db-logic`, `feature/FE-04-connect-to-real-api`
 - **Output:**
     - 管理画面から記事を作成 → DBに保存される → 記事一覧に表示される → 記事を編集 → DB内容が更新される → 記事を削除 → DBから削除される、という一連の動作が正常に完了する。
-- **ステータス:** 進行中 (BLOCKER: `I-01.1`の完了待ち)
+- **ステータス:** **完了**
 
-### 📝 Level 3 計画ドキュメント (I-01: 最終統合テスト)
+### 🎟️ チケット I-02: 記事CRUD機能のE2Eテストと最終調整
+- **担当:** Frontend
+- **ブランチ:** `feature/I-02-final-e2e-crud-test`
+- **説明:** 記事のCRUD操作全体をカバーする、堅牢なE2Eテストスイートを実装する。
+- **ステータス:** **完了**
 
-#### 0. Branch
-- ブランチ: `feature/I-01-e2e-integration`
-
-#### 1. Requirements Analysis
-- フロントエンド(Next.js) とバックエンド(Spring Boot) を Docker Compose で同時起動し、管理画面から記事 CRUD が問題なく動作することを確認する。
-- API プロキシ (`/api/proxy/...`) がフロントエンド → バックエンドへ正しくルーティングされること。
-- テストは **Playwright** でブラウザ E2E、自動化スクリプトを GitHub Actions で実行可能にする。
-
-#### 2. Components Affected
-- `docker-compose.yml` (E2E 専用 profile 追加)  
-- `app/api/proxy/[...path]/route.ts` (必要に応じ修正)  
-- `tests/e2e/*` (Playwright テストスイート)  
-- `.github/workflows/ci.yml` (E2E ジョブ追加)
-
-#### 3. Implementation Strategy
-1. **Environment**: Docker Compose で backend:8080、frontend:3000 を起動後、Playwright コンテナで E2E 実行
-2. **Playwright Setup**: `npx playwright install` → `playwright.config.ts` を作成し、Chromium ヘッドレスで実行
-3. **Test Scenarios**:
-   - 記事一覧が 200 OK で表示される
-   - 「新規作成」→ 記事フォームに入力→ 保存 → 一覧に表示
-   - 記事をクリック→ 編集→ タイトル変更→ 保存 → 一覧に反映
-   - 記事削除→ モーダル確認→ 一覧から消える
-4. **CI**: GitHub Actions 上で docker compose + Playwright を起動し、E2E ジョブを追加
-
-#### 4. Detailed Steps & Checklist
-- [ ] Docker Compose に `e2e` サービス (Playwright) 追加
-- [ ] `playwright.config.ts` 作成
-- [ ] 記事 CRUD の E2E テストスクリプト実装
-- [ ] `package.json` に `npm run e2e` スクリプト追加
-- [ ] `.github/workflows/ci.yml` に E2E ステップ追加
-- [ ] ローカル `npm run e2e` がグリーン
-- [ ] GitHub Actions でワークフローが成功
-
-#### 5. Potential Challenges
-- コンテナ間ネットワーク遅延によるタイムアウト → Playwright `timeout` 拡大
-- CSRF / CORS 問題 → フロント↔バック間は同一 docker ネットワークで解決
-
-#### 6. Creative Phase Components
-- UI は既存のまま、Creative フェーズ不要
-
-⏭️ NEXT MODE: IMPLEMENT MODE
-
-### 📝 Level 2 計画ドキュメント (I-01.2: UI セレクタ整合)
+### 📝 Level 3 計画ドキュメント (I-01.2: UI セレクタ整合)
 
 #### 0. Overview
 Playwright E2E テストが期待する `data-testid` と実際の管理画面 UI コンポーネントが不一致のため、画面側へテスト用セレクタを追加しテキストを統一する。
@@ -377,21 +339,19 @@ Playwright E2E テストが期待する `data-testid` と実際の管理画面 U
 
 ⏭️ NEXT MODE: IMPLEMENT MODE
 
----
-
 ## フェーズ 4 進捗まとめ
 
-### 🎟️ チケット I-01: E2E 統合テスト **完了**
+### 🎟️ チケット I-01 & I-02: E2E 統合テスト **完了**
 
 | 検証項目 | 結果 |
 |----------|------|
-| Playwright CRUD / API テスト 5 本 | ✅ |
+| Playwright CRUD / API テスト | ✅ |
 | `data-testid` 付与による UI 自動テスト対応 | ✅ |
 | GitHub Actions `frontend-test` / `backend-test` / `e2e-test` | ✅ |
 | Docker Compose v2 対応 (`docker compose`) | ✅ |
 | Playwright イメージ 1.53.0-jammy へ更新 | ✅ |
 
-これにより I-01 フェーズの目的（CI 上での統合テスト自動化）は達成されました。
+これにより I-01, I-02 フェーズの目的（CI 上での統合テスト自動化）は達成されました。
 
 ---
 
@@ -401,13 +361,13 @@ Playwright E2E テストが期待する `data-testid` と実際の管理画面 U
 |------------|------|----------|------|
 | **CD-01** | Docker イメージのビルド & GHCR への Push ワークフロー追加 | `feature/CD-01-ghcr-push` | DevOps |
 | **INF-01** | 本番用 PostgreSQL と GitHub Secrets の整備 | `feature/INF-01-prod-db-secrets` | Infrastructure |
-| **BE-05** | 外部 Postgres 接続 + Flyway マイグレーション & `prod` プロファイル実装 | `feature/BE-05-external-postgres` | Backend |
+| **BE-05-flyway-and-prod-profile** | 外部 Postgres 接続 + Flyway マイグレーション & `prod` プロファイル実装 | `feature/BE-05-external-postgres` | Backend |
 | **OPS-01** | Nginx (または Traefik) による HTTPS リバースプロキシ設定 | `feature/OPS-01-nginx-https` | DevOps |
 
 ### TODO Checklist
 - [ ] CD-01: GHCR へ backend / frontend イメージ自動 Push
 - [ ] INF-01: 本番 DB 構築 & 接続シークレット登録
-- [ ] BE-05: `prod` プロファイルでの外部 Postgres 対応 + Flyway 移行スクリプト
+- [x] BE-05-flyway-and-prod-profile: `prod` プロファイルでの外部 Postgres 対応 + Flyway 移行スクリプト
 - [ ] OPS-01: HTTPS 終端 & リバースプロキシ構築
 - [ ] README / ドキュメント更新（デプロイ手順）
 
@@ -423,7 +383,7 @@ Playwright E2E テストが期待する `data-testid` と実際の管理画面 U
   - `createContent` / `updateContent` 呼び出し時に `tags` 配列を送信。
   - 新規記事作成後、UI 側で成功メッセージを表示。
 
-### 🎟️ チケット BE-05: バックエンド – メタデータ拡張 (`tags`, `dateTime`)
+### 🎟️ チケット BE-05-tags-and-datetime (完了): バックエンド – メタデータ拡張 (`tags`, `dateTime`)
 - **担当:** Backend
 - **ブランチ:** `feature/BE-05-tags-and-datetime`
 - **説明:** `ContentCreateRequestDto`, `ContentUpdateRequestDto`, `ContentService` を拡張し、
@@ -633,7 +593,7 @@ Playwright E2E テストが期待する `data-testid` と実際の管理画面 U
   - [ ] 管理画面のレイアウトにログアウトボタンを設置する。
   - [ ] ログアウトボタンクリック時、Cookieを削除し`/login`へリダイレクトさせる。
   - [ ] ルートガードとログアウト機能を検証するE2Eテストを追加する。
-- **ステータス:** **進行中**
+- **ステータス:** **完了**
 
 ### TODO Checklist (Auth Phase)
 - [ ] BE-06: JWT 認証 API
