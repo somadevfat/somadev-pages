@@ -588,19 +588,21 @@ Playwright E2E テストが期待する `data-testid` と実際の管理画面 U
 ### 🎟️ チケット FE-08: ログイン画面の実装
 - **担当:** Frontend
 - **ブランチ:** `feature/FE-08-login-page`
-- **説明:** Next.js App Router で `/login` ルートを作成し、メール + パスワードでログインできるフォームを実装。成功時に JWT を cookie に保存する。
+- **説明:** ユーザーが認証するためのログインUIを実装する。
+- **Input:** BE-06で実装された `/api/auth/login` エンドポイント。
 - **Output:**
-  - `app/login/page.tsx` + `LoginForm` コンポーネント
-  - `lib/auth-client.ts` で `login()` を実装
-  - 成功時に `/admin` へリダイレクト、失敗時にエラーメッセージ表示。
+  - [ ] `/login` ルートにメールアドレスとパスワードの入力フォームを設置する。
+  - [ ] フォーム送信時に `/api/proxy/auth/login` へPOSTリクエストを送信する。
+  - [ ] ログイン成功時、返却されたJWTをCookieに保存する。
+  - [ ] ログイン成功後、`/admin/articles` へリダイレクトする。
+  - [ ] ログイン失敗時、画面にエラーメッセージを表示する。
+- **ステータス:** **進行中**
 
-### 🎟️ チケット FE-09: 管理画面ルートガード
+### 🎟️ チケット FE-09: 管理画面のルートガード
 - **担当:** Frontend
 - **ブランチ:** `feature/FE-09-admin-route-guard`
-- **説明:** App Router の `middleware.ts` で `/admin/**` へのアクセスを検査し、JWT が無い場合 `/login` へリダイレクト。
-- **Output:**
-  - `middleware.ts` に認可ロジック追加
-  - E2E テストに「未ログイン時にリダイレクトされる」シナリオを追加。
+- **説明:** 未認証ユーザーが管理画面にアクセスできないように保護し、ログアウト機能を実装する。
+- **ステータス:** 未着手
 
 ### TODO Checklist (Auth Phase)
 - [ ] BE-06: JWT 認証 API
