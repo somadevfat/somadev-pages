@@ -26,16 +26,27 @@ export async function getContents(type: 'articles' | 'projects'): Promise<Articl
       return [];
     }
 
-    const data = await res.json();
-    
+    type ApiContentItem = {
+      slug: string;
+      metadata: {
+        title: string;
+        date: string;
+        summary: string;
+        tags?: string[];
+      };
+      body: string;
+    };
+
+    const data: ApiContentItem[] = await res.json();
+
     // APIレスポンスをArticleData[]に変換
-    const articles: ArticleData[] = data.map((item: any) => ({
+    const articles: ArticleData[] = data.map((item) => ({
       slug: item.slug,
       title: item.metadata.title,
       date: item.metadata.date,
       summary: item.metadata.summary,
-      tags: item.metadata.tags || [], // tagsがない場合は空配列
-      body: item.body
+      tags: item.metadata.tags ?? [], // tagsがない場合は空配列
+      body: item.body,
     }));
 
     return articles;

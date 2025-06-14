@@ -1,17 +1,14 @@
 import Layout from '@/components/Layout';
 import { getContent } from '@/lib/api-client';
 import { notFound } from 'next/navigation';
-import type { Metadata, ResolvingMetadata } from 'next';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { remark } from 'remark';
 import html from 'remark-html';
 
 export const dynamic = 'force-dynamic';
 
-export async function generateMetadata(
-  { params }: { params: { slug: string } },
-  _parent: ResolvingMetadata
-): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   try {
     const article = await getContent('articles', params.slug);
     if (!article) {
