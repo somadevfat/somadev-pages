@@ -22,18 +22,26 @@ test.describe.serial('Article CRUD Operations', () => {
 
   test.beforeEach(async ({ page }) => {
     // Always start from login page to ensure authenticated session
-    await page.goto('/login');
+    await page.goto('/login', { timeout: 15000 });
 
-    // If already logged in, /login might redirect immediately
-    if (page.url().includes('/login')) {
+    // Check if we're still on login page (not already logged in)
+    try {
+      await page.waitForSelector('[data-testid="email-input"]', { timeout: 5000 });
+      // Fill login form
+      if (!adminEmail || !adminPassword) {
+        throw new Error('Admin credentials not available');
+      }
       await page.fill('[data-testid="email-input"]', adminEmail);
       await page.fill('[data-testid="password-input"]', adminPassword);
       await page.click('[data-testid="login-button"]');
+    } catch (error) {
+      // Already logged in or login form not found, continue
+      console.log('Login form not found, assuming already logged in');
     }
 
     // Wait until admin articles page loads
-    await page.waitForURL('**/admin/articles', { timeout: 30000 });
-    await page.waitForSelector('[data-testid="new-article-button"]', { timeout: 30000 });
+    await page.waitForURL('**/admin/articles', { timeout: 15000 });
+    await page.waitForSelector('[data-testid="new-article-button"]', { timeout: 15000 });
   });
 
   test('should create a new article', async ({ page }) => {
