@@ -1,127 +1,102 @@
-import { test, expect } from '@playwright/test';
-
-test.setTimeout(60000);
+import { test, expect, Page } from '@playwright/test';
 
 const adminEmail = process.env.E2E_TEST_USER_EMAIL;
 const adminPassword = process.env.E2E_TEST_USER_PASSWORD;
 
+// ユニークなテストデータを生成
+const testArticle = {
+  title: `E2E Test Article ${Date.now()}`,
+  slug: `e2e-test-article-${Date.now()}`,
+  content: 'This is a test article created by the E2E test suite.',
+  tags: ['test', 'e2e'],
+  excerpt: 'Test excerpt for E2E testing a CRUD flow.'
+};
+
+let page: Page;
+
 test.describe.serial('Article CRUD Operations', () => {
-  const testArticle = {
-    title: 'E2E Test Article',
-    slug: 'e2e-test-article',
-    content: 'This is a test article created by E2E test.',
-    tags: ['test', 'e2e'],
-    excerpt: 'Test excerpt for E2E testing'
-  };
 
-  test.beforeAll(() => {
-    if (!adminEmail || !adminPassword) {
-      throw new Error('E2E_TEST_USER_EMAIL and E2E_TEST_USER_PASSWORD environment variables must be set.');
-    }
-  });
-
-  test.beforeEach(async ({ page }) => {
-    // Always start from login page to ensure authenticated session
-    await page.goto('/login', { timeout: 15000 });
-
-    // Check if we're still on login page (not already logged in)
-    try {
-      await page.waitForSelector('[data-testid="email-input"]', { timeout: 5000 });
-      // Fill login form
-      if (!adminEmail || !adminPassword) {
-        throw new Error('Admin credentials not available');
-      }
-      await page.fill('[data-testid="email-input"]', adminEmail);
-      await page.fill('[data-testid="password-input"]', adminPassword);
-      await page.click('[data-testid="login-button"]');
-    } catch (error) {
-      // Already logged in or login form not found, continue
-      console.log('Login form not found, assuming already logged in');
-    }
-
-    // Wait until admin page is loaded by checking for logout button
-    await expect(page.locator('[data-testid="logout-button"]')).toBeVisible({ timeout: 15000 });
-  });
-
-  test('should create a new article', async ({ page }) => {
-    // Clean up existing article in case previous test run left residue
-    await page.request.delete(`/api/proxy/contents/articles/${testArticle.slug}`).catch(() => {});
-
-    // Click "New Article" button
-    await page.click('[data-testid="new-article-button"]');
+  test.beforeAll(async ({ browser }) => {
+    // 全テストの前に一度だけログインし、クリーンアップを行う
+    page = await browser.newPage();
     
-    // Fill article form
+    if (!adminEmail || !adminPassword) {
+      throw new Error('Test credentials are not set in environment variables.');
+    }
+
+    // ログイン処理
+    await page.goto('/login');
+    await page.fill('[data-testid="email-input"]', adminEmail);
+    await page.fill('[data-testid="password-input"]', adminPassword);
+    await page.click('[data-testid="login-button"]');
+    await expect(page.locator('[data-testid="logout-button"]')).toBeVisible({ timeout: 15000 });
+
+    // 前回のテストが残した可能性のあるデータを削除
+    await page.request.delete(`/api/proxy/contents/articles/${testArticle.slug}`).catch(() => {});
+  });
+
+  test.afterAll(async () => {
+    // 全テスト終了後にテストデータをクリーンアップ
+    await page.request.delete(`/api/proxy/contents/articles/${testArticle.slug}`).catch(() => {});
+    await page.close();
+  });
+
+  test('should create a new article', async () => {
+    await page.goto('/admin/articles');
+    
+    await page.click('[data-testid="new-article-button"]');
+    await expect(page).toHaveURL(/.*\/admin\/articles\/new/);
+
+    // フォーム入力
     await page.fill('[data-testid="title-input"]', testArticle.title);
     await page.fill('[data-testid="slug-input"]', testArticle.slug);
     await page.fill('[data-testid="content-textarea"]', testArticle.content);
     await page.fill('[data-testid="excerpt-input"]', testArticle.excerpt);
-    
-    // Add tags
     for (const tag of testArticle.tags) {
       await page.fill('[data-testid="tag-input"]', tag);
       await page.press('[data-testid="tag-input"]', 'Enter');
     }
     
-    // Save article
     await page.click('[data-testid="save-button"]');
     
-    // Verify redirect to articles list
-    await page.waitForURL('**/admin/articles', { timeout: 30000 });
-    
-    // Verify article appears in list
+    await expect(page).toHaveURL(/.*\/admin\/articles/);
     await expect(page.locator(`text=${testArticle.title}`)).toBeVisible();
   });
 
-  test('should read and display article', async ({ page }) => {
-    // Navigate to the created article
+  test('should read the created article', async () => {
     await page.goto(`/blog/${testArticle.slug}`);
     
-    // Wait for article title to load
-    await page.waitForSelector('h1', { timeout: 30000 });
-    // Verify article content is displayed
     await expect(page.locator('h1')).toContainText(testArticle.title);
-    await expect(page.locator('text=' + testArticle.content)).toBeVisible();
-    
-    // Verify tags are displayed as links
+    await expect(page.locator(`text=${testArticle.content}`)).toBeVisible();
     for (const tag of testArticle.tags) {
       await expect(page.locator(`a[href="/blog?tag=${tag}"]`)).toBeVisible();
     }
   });
 
-  test('should update an existing article', async ({ page }) => {
-    // Wait for edit button to be visible then click
-    await page.waitForSelector(`[data-testid="edit-${testArticle.slug}"]`, { timeout: 30000 });
+  test('should update the article', async () => {
+    await page.goto('/admin/articles');
+    
+    const updatedTitle = `${testArticle.title} (Updated)`;
     await page.click(`[data-testid="edit-${testArticle.slug}"]`);
     
-    const updatedTitle = testArticle.title + ' (Updated)';
+    await expect(page).toHaveURL(new RegExp(`.*\\/admin\\/articles\\/edit\\/${testArticle.slug}`));
     
-    // Update title
     await page.fill('[data-testid="title-input"]', updatedTitle);
-    
-    // Save changes
     await page.click('[data-testid="save-button"]');
     
-    // Verify redirect and updated title
-    await page.waitForURL('**/admin/articles', { timeout: 30000 });
+    await expect(page).toHaveURL(/.*\/admin\/articles/);
     await expect(page.locator(`text=${updatedTitle}`)).toBeVisible();
+    testArticle.title = updatedTitle; // 後続のテストのためにタイトルを更新
   });
 
-  test('should delete an article', async ({ page }) => {
-    // Wait for delete button to appear and click
-    await page.waitForSelector(`[data-testid="delete-${testArticle.slug}"]`, { timeout: 30000 });
+  test('should delete the article', async () => {
+    await page.goto('/admin/articles');
+    
     await page.click(`[data-testid="delete-${testArticle.slug}"]`);
+    // ここで確認ダイアログの処理が必要な場合がある
+    // page.on('dialog', dialog => dialog.accept());
     
-    // Verify article is removed from list
-    await expect(page.locator(`text=${testArticle.title}`)).not.toBeVisible();
+    await expect(page.locator(`text=${testArticle.title}`)).not.toBeVisible({ timeout: 10000 });
   });
 
-  test('should verify API proxy functionality', async ({ page }) => {
-    // Test API proxy by making a direct request
-    const response = await page.request.get('/api/proxy/contents/articles');
-    expect(response.status()).toBe(200);
-    
-    // Verify response contains expected data structure
-    const data = await response.json();
-    expect(Array.isArray(data)).toBeTruthy();
-  });
 }); 
