@@ -8,9 +8,10 @@ interface TagInputProps {
   onChange: (tags: string[]) => void;
   placeholder?: string;
   suggestions?: string[]; // 既存タグ候補
+  [key: string]: unknown;
 }
 
-export default function TagInput({ tags, onChange, placeholder = 'Add a tag...', suggestions = [] }: TagInputProps) {
+export default function TagInput({ tags, onChange, placeholder = 'Add a tag...', suggestions = [], ...divProps }: TagInputProps) {
   const [inputValue, setInputValue] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -70,6 +71,7 @@ export default function TagInput({ tags, onChange, placeholder = 'Add a tag...',
     <div
       ref={containerRef}
       className="relative flex flex-wrap gap-2 p-2 border border-gray-300 rounded-md focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-indigo-500 bg-white min-h-[42px]"
+      {...divProps}
     >
       {tags.map((tag, index) => (
         <div 
@@ -100,6 +102,7 @@ export default function TagInput({ tags, onChange, placeholder = 'Add a tag...',
           }
         }}
         className="flex-grow min-w-[120px] outline-none border-none bg-transparent text-sm text-gray-900 placeholder-gray-400"
+        data-testid="tag-input"
         placeholder={tags.length === 0 ? placeholder : ''}
       />
 

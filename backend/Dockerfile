@@ -11,6 +11,9 @@ RUN mvn package -DskipTests
 # ---- 実行ステージ ----
 FROM eclipse-temurin:17-jre-focal
 
+# Install curl for healthcheck
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
 # ビルドステージから生成されたJARファイルをコピー
 COPY --from=build /workspace/target/*.jar app.jar
 

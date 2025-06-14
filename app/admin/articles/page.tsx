@@ -1,18 +1,25 @@
-import { getContents } from '@/lib/api-client';
-import Link from 'next/link';
-import type { Content } from '@/types/content';
+"use client";
+import { useEffect, useState } from "react";
+import { getContents } from "@/lib/api-client";
+import Link from "next/link";
+import type { Content } from "@/types/content";
 
-export const dynamic = 'force-dynamic';
+export default function ArticlesPage() {
+  const [articles, setArticles] = useState<Content[]>([]);
 
-export default async function ArticlesPage() {
-  const articles: Content[] = await getContents('articles');
-
-  // 日付で降順にソート
-  const sortedArticles = articles.sort((a, b) => {
-    const dateA = new Date(a.metadata.date);
-    const dateB = new Date(b.metadata.date);
-    return dateB.getTime() - dateA.getTime();
-  });
+  useEffect(() => {
+    (async () => {
+      const data = await getContents("articles");
+      // 日付で降順にソート
+      setArticles(
+        data.sort((a, b) => {
+          const dateA = new Date(a.metadata.date);
+          const dateB = new Date(b.metadata.date);
+          return dateB.getTime() - dateA.getTime();
+        })
+      );
+    })();
+  }, []);
 
   return (
     <div className="bg-white p-8 rounded-lg shadow-md">
@@ -20,9 +27,10 @@ export default async function ArticlesPage() {
         <h1 className="text-3xl font-bold text-gray-800">Articles</h1>
         <Link
           href="/admin/new"
+          data-testid="new-article-button"
           className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
         >
-          New Post
+          New Article
         </Link>
       </div>
       <div className="overflow-x-auto">
@@ -46,19 +54,39 @@ export default async function ArticlesPage() {
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {sortedArticles.map((article) => (
+          <tbody className="bg-white divide-y divide-gray-200" data-testid="articles-table-body">
+            {articles.map((article) => (
               <tr key={article.slug}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{article.metadata.title}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{article.metadata.date}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  {article.metadata.title}
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {article.metadata.tags?.join(', ')}
+                  {article.metadata.date}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {article.metadata.tags?.join(", ")}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{article.slug}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <Link href={`/admin/edit/${article.slug}`} className="text-indigo-600 hover:text-indigo-900">
+                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-4">
+                  <Link
+                    href={`/admin/edit/${article.slug}`}
+                    data-testid={`edit-${article.slug}`}
+                    className="text-indigo-600 hover:text-indigo-900"
+                  >
                     Edit
                   </Link>
+                  <button
+                    type="button"
+                    data-testid={`delete-${article.slug}`}
+                    className="text-red-600 hover:text-red-800"
+                    onClick={async () => {
+                      await fetch(`/api/proxy/contents/articles/${article.slug}`, { method: "DELETE" });
+                      // Remove deleted article from local state without reload
+                      setArticles((prev) => prev.filter((a) => a.slug !== article.slug));
+                    }}
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}

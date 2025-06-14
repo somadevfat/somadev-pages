@@ -59,3 +59,7 @@ testghost/
 
 # VSCode workspace settings
 .vscode/
+
+# Playwright artifacts
+playwright-report/
+test-results/
