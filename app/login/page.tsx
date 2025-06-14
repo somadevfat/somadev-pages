@@ -24,8 +24,12 @@ export default function LoginPage() {
       // 保存: Cookie にトークンを保存 (有効期限1日)
       document.cookie = `token=${data.token}; path=/; max-age=86400`;
       router.replace("/admin/articles");
-    } catch (err: any) {
-      setError(err.message || "Login failed");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Login failed");
+      }
     }
   }
 
