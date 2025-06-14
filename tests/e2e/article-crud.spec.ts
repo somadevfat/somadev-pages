@@ -12,19 +12,18 @@ test.describe.serial('Article CRUD Operations', () => {
   };
 
   test.beforeEach(async ({ page }) => {
-    // Navigate to admin articles page (will redirect to /login if not authenticated)
-    await page.goto('/admin/articles');
+    // Always start from login page to ensure authenticated session
+    await page.goto('/login');
 
+    // If already logged in, /login might redirect immediately
     if (page.url().includes('/login')) {
-      // Perform login
       await page.fill('[data-testid="email-input"]', 'admin@example.com');
       await page.fill('[data-testid="password-input"]', 'password');
       await page.click('[data-testid="login-button"]');
-      // Wait for redirect back to admin/articles
-      await page.waitForURL('**/admin/articles', { timeout: 30000 });
     }
 
-    // Ensure page is ready
+    // Wait until admin articles page loads
+    await page.waitForURL('**/admin/articles', { timeout: 30000 });
     await page.waitForSelector('[data-testid="new-article-button"]', { timeout: 30000 });
   });
 
