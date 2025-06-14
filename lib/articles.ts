@@ -38,7 +38,7 @@ export async function getContents(type: 'articles' | 'projects'): Promise<Articl
     };
 
     const data: ApiContentItem[] = await res.json();
-
+    
     // APIレスポンスをArticleData[]に変換
     const articles: ArticleData[] = data.map((item) => ({
       slug: item.slug,

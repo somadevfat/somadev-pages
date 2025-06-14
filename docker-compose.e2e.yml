@@ -46,6 +46,8 @@ services:
       - .:/app
     command: >
       sh -c "
+        echo "E2E_TEST_USER_EMAIL is: $E2E_TEST_USER_EMAIL" &&
+        echo "E2E_TEST_USER_PASSWORD is: $E2E_TEST_USER_PASSWORD" &&
         npm ci &&
         npx playwright test --config=playwright.config.ts
       "
@@ -54,4 +56,6 @@ services:
         condition: service_healthy
     environment:
       - CI=true
-      - PLAYWRIGHT_BASE_URL=http://frontend:3000 
+      - PLAYWRIGHT_BASE_URL=http://frontend:3000
+      - E2E_TEST_USER_EMAIL
+      - E2E_TEST_USER_PASSWORD 
