@@ -1,4 +1,5 @@
 import { Content } from '@/types/content';
+import { AuthRequest, AuthResponse } from '@/types/auth';
 
 // サーバーサイド（Node.js）かクライアントサイド（ブラウザ）かを判定
 const isServer = typeof window === 'undefined';
@@ -85,4 +86,21 @@ export async function deleteContent(type: string, slug: string): Promise<void> {
   if (!res.ok && res.status !== 204) {
     throw new Error(`Failed to delete content: ${res.statusText}`);
   }
+}
+
+export async function login(credentials: AuthRequest): Promise<AuthResponse> {
+  const url = `${API_BASE_URL}/auth/login`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(credentials),
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({ message: res.statusText }));
+    throw new Error(errorData.message || 'Invalid credentials');
+  }
+  return res.json();
 } 
