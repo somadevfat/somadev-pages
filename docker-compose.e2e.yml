@@ -1,0 +1,57 @@
+# Docker Compose file for E2E tests (version key removed as Compose v2 ignores it)
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=local
+      - SPRING_DATASOURCE_URL=jdbc:h2:mem:testdb
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_BASE_URL=/api/proxy
+      - API_BASE_URL_INTERNAL=http://backend:8080/api
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  e2e-tests:
+    image: mcr.microsoft.com/playwright:v1.53.0-jammy
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: >
+      sh -c "
+        npm ci &&
+        npx playwright test --config=playwright.config.ts
+      "
+    depends_on:
+      frontend:
+        condition: service_healthy
+    environment:
+      - CI=true
+      - PLAYWRIGHT_BASE_URL=http://frontend:3000 

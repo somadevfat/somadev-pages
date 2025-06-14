@@ -4,9 +4,12 @@ import { Content } from '@/types/content';
 const isServer = typeof window === 'undefined';
 
 // 実行環境に応じてAPIのベースURLを切り替える
-const API_BASE_URL = isServer
-  ? process.env.API_BASE_URL_INTERNAL // サーバーサイドでは内部URL
-  : process.env.NEXT_PUBLIC_API_BASE_URL; // クライアントサイドでは公開URL
+const API_BASE_URL = (() => {
+  if (isServer) {
+    return process.env.API_BASE_URL_INTERNAL || 'http://localhost:8080/api';
+  }
+  return process.env.NEXT_PUBLIC_API_BASE_URL || '/api/proxy';
+})();
 
 async function fetcher<T>(url: string): Promise<T> {
   const res = await fetch(url);
@@ -74,4 +77,12 @@ export async function createContent(
     throw new Error(`Failed to create content: ${errorData.message || res.statusText}`);
   }
   return res.json();
+}
+
+export async function deleteContent(type: string, slug: string): Promise<void> {
+  const url = `${API_BASE_URL}/contents/${type}/${slug}`;
+  const res = await fetch(url, { method: 'DELETE' });
+  if (!res.ok && res.status !== 204) {
+    throw new Error(`Failed to delete content: ${res.statusText}`);
+  }
 } 
