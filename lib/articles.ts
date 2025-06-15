@@ -1,5 +1,8 @@
 import 'server-only';
 
+// サーバーサイド専用の環境変数（絶対URL）を直接読み込む
+const API_BASE_URL = process.env.API_BASE_URL_INTERNAL;
+
 export interface ArticleData {
   slug: string;
   title: string;
@@ -13,21 +16,21 @@ export type TagCount = { [key: string]: number };
 
 // APIから記事データを取得する関数
 export async function getContents(type: 'articles' | 'projects'): Promise<ArticleData[]> {
-  console.log(`Fetching contents for type: ${type}`);
+  console.log(`Fetching contents for type: ${type} from ${API_BASE_URL}`);
+  
+  if (!API_BASE_URL) {
+    console.error('Error: API_BASE_URL_INTERNAL is not set.');
+    return [];
+  }
+
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-    if (!baseUrl) {
-      console.error('Error: NEXT_PUBLIC_API_BASE_URL is not set.');
-      return [];
-    }
-    const res = await fetch(`${baseUrl}/api/contents/${type}`, { cache: 'no-store' });
+    // API_BASE_URLを直接使って、完全なURLを生成する
+    const res = await fetch(`${API_BASE_URL}/contents/${type}`, { cache: 'no-store' });
 
     if (!res.ok) {
       console.error(`Failed to fetch ${type}:`, res.status, res.statusText);
       const errorBody = await res.text();
       console.error('Error Body:', errorBody);
-      // エラーが発生した場合、空の配列を返すか、エラーをスローするか選択
-      // ここでは空の配列を返して、フロントエンドがクラッシュしないようにする
       return [];
     }
 
@@ -59,4 +62,4 @@ export async function getContents(type: 'articles' | 'projects'): Promise<Articl
     console.error(`Error fetching ${type}:`, error);
     return [];
   }
-} 
+}
