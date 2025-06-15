@@ -56,7 +56,7 @@ public class ContentService {
         metadataMap.put("title", createDto.getTitle());
         metadataMap.put("date", LocalDate.now().toString());
         metadataMap.put("dateTime", java.time.LocalDateTime.now().toString());
-        metadataMap.put("summary", "This is a new article."); // Default summary
+        metadataMap.put("summary", createDto.getSummary());
 
         java.util.List<String> tags = createDto.getTags() != null ? createDto.getTags() : new ArrayList<>();
         metadataMap.put("tags", tags);

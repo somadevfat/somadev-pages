@@ -67,6 +67,7 @@ export default function ArticleEditorForm({ article }: ArticleEditorFormProps) {
         await updateContent('articles', article.slug, {
           title,
           content: markdown,
+          summary: excerpt,
           tags,
         });
         setSuccessMessage('Article updated successfully!');
@@ -78,6 +79,7 @@ export default function ArticleEditorForm({ article }: ArticleEditorFormProps) {
         await createContent('articles', {
           slug,
           title,
+          summary: excerpt,
           content: markdown,
           tags,
         });
