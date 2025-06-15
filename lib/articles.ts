@@ -15,7 +15,12 @@ export type TagCount = { [key: string]: number };
 export async function getContents(type: 'articles' | 'projects'): Promise<ArticleData[]> {
   console.log(`Fetching contents for type: ${type}`);
   try {
-    const res = await fetch(`http://backend:8080/api/contents/${type}`, { cache: 'no-store' });
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+    if (!baseUrl) {
+      console.error('Error: NEXT_PUBLIC_API_BASE_URL is not set.');
+      return [];
+    }
+    const res = await fetch(`${baseUrl}/api/contents/${type}`, { cache: 'no-store' });
 
     if (!res.ok) {
       console.error(`Failed to fetch ${type}:`, res.status, res.statusText);
