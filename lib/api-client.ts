@@ -42,7 +42,7 @@ export async function getContent(type: string, slug: string): Promise<Content | 
 export async function updateContent(
   type: string,
   slug: string,
-  data: { title: string; content: string; tags: string[] }
+  data: { title: string; content: string; summary?: string; tags: string[] }
 ): Promise<Content> {
   const url = `${API_BASE_URL}/contents/${type}/${slug}`;
   const res = await fetch(url, {
@@ -61,7 +61,7 @@ export async function updateContent(
 
 export async function createContent(
   type: string,
-  data: { slug: string; title: string; content: string; tags: string[] }
+  data: { slug: string; title: string; summary?: string; content: string; tags: string[] }
 ): Promise<Content> {
   const url = `${API_BASE_URL}/contents/${type}`;
   const res = await fetch(url, {
@@ -103,4 +103,4 @@ export async function login(credentials: AuthRequest): Promise<AuthResponse> {
     throw new Error(errorData.message || 'Invalid credentials');
   }
   return res.json();
-} 
+}

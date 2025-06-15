@@ -6,6 +6,7 @@ import lombok.Data;
 public class ContentCreateRequestDto {
     private String slug;
     private String title;
+    private String summary;
     private String content;
 
     // 記事に関連付けるタグ
