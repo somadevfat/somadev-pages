@@ -31,13 +31,13 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         // Create admin user
-        if (userRepository.findByEmail("admin@example.com").isEmpty()) {
-            User admin = User.builder()
-                    .email("admin@example.com")
-                    .password(passwordEncoder.encode("password"))
-                    .build();
-            userRepository.save(admin);
-        }
+            if (userRepository.findByEmail("admin@example.com").isEmpty()) {
+                User admin = User.builder()
+                        .email("admin@example.com")
+                        .password(passwordEncoder.encode("password"))
+                        .build();
+                userRepository.save(admin);
+            }
 
         // Create dummy content for testing
         if (contentRepository.findByTypeAndSlug("articles", "dummy-post").isEmpty()) {
