@@ -49,6 +49,11 @@ jobs:
     
     - name: Run backend tests
       run: cd backend && ./mvnw test
+
+    - name: Vulnerability Scan
+      env:
+        NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+      run: cd backend && ./mvnw dependency-check:check
     
     - name: Upload surefire reports
       if: always()

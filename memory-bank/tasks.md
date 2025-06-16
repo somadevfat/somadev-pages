@@ -706,6 +706,32 @@ Playwright E2E テストが期待する `data-testid` と実際の管理画面 U
     - [ ] GitHub Actionsのワークフローに、`mvn dependency-check:check`を実行するステップを追加する。
     - [ ] 脆弱性が発見された場合にビルドが失敗するように設定する。
 
+#### 📝 Level 2 計画ドキュメント (CI-01)
+
+##### 1. Overview (概要)
+`backend`モジュールのCIパイプラインにOWASP `dependency-check-maven`プラグインを導入し、ビルド時に自動で依存関係の脆弱性スキャンを実行する。深刻度が8以上の脆弱性が発見された場合、ビルドを失敗させることで、安全でないライブラリの混入を未然に防ぐ。
+
+##### 2. Files to Modify (修正対象ファイル)
+- `backend/pom.xml`: 脆弱性スキャンプラグインの追加と設定。
+- `.github/workflows/ci.yml`: スキャンを実行するステップの追加と、スキャン高速化のためのNVD APIキーの設定。
+
+##### 3. Implementation Steps (実装手順)
+1.  **`pom.xml`の編集:**
+    -   `<build>` -> `<plugins>`セクションに`org.owasp:dependency-check-maven`プラグインを追加する。
+    -   プラグインの設定(`<configuration>`)で、スキャン失敗の閾値をCVSSスコア8以上に設定する (`<failBuildOnCVSS>8</failBuildOnCVSS>`)。
+    -   NVD APIキーを環境変数 `NVD_API_KEY` から読み込むように設定する。
+
+2.  **GitHub Actions (`ci.yml`) の編集:**
+    -   `backend-test`ジョブに、`NVD_API_KEY`という名前でGitHub Secrets (`secrets.NVD_API_KEY`) を環境変数として渡す設定を追加する。
+    -   `Run backend tests` ステップの後に、`Vulnerability Scan`という名前で新しいステップを追加する。
+    -   このステップで、コマンド `mvn dependency-check:check` を実行する。
+
+##### 4. Testing Strategy (テスト戦略)
+- 変更を加えた`feature/CI-01-vulnerability-scan`ブランチをGitHubにプッシュし、Actionsタブで`backend-test`ジョブの`Vulnerability Scan`ステップが正常に実行されることを確認する。
+- 意図的に脆弱なライブラリを追加して、ビルドが正しく失敗することも確認できるとより望ましい（今回は省略）。
+
+- **ステータス:** **計画完了** (Ready for Implementation)
+
 ---
 
 ## 🔍 QA調査記録: Docker環境でのJWT設定問題 (2025-06-16)
