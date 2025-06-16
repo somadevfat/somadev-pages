@@ -48,13 +48,12 @@ jobs:
           path: backend/target/surefire-reports/
           retention-days: 30
       - name: Dependency Check
-        working-directory: ./backend
+        working-directory: backend
         env:
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
-        if: env.NVD_API_KEY != ''
         run: |
-          ./mvnw org.owasp:dependency-check-maven:purge
-          ./mvnw org.owasp:dependency-check-maven:check -f backend/pom.xml
+          ../mvnw org.owasp:dependency-check-maven:purge
+          ../mvnw org.owasp:dependency-check-maven:check
 
   e2e-test:
     runs-on: ubuntu-latest
