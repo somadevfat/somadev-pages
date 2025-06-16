@@ -12,11 +12,28 @@ const API_BASE_URL = (() => {
   return process.env.NEXT_PUBLIC_API_BASE_URL || '/api/proxy';
 })();
 
+async function apiFetch(url: string, options: RequestInit = {}): Promise<Response> {
+  const defaultOptions: RequestInit = {
+    credentials: 'include', // Automatically send cookies
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  };
+
+  const mergedOptions: RequestInit = {
+    ...defaultOptions,
+    ...options,
+  };
+
+  return fetch(url, mergedOptions);
+}
+
 async function fetcher<T>(url: string): Promise<T> {
-  const res = await fetch(url);
+  const res = await apiFetch(url);
   if (!res.ok) {
-    // More specific error handling could be added here
-    throw new Error(`An error occurred while fetching the data: ${res.statusText}`);
+    const errorData = await res.json().catch(() => ({ message: res.statusText }));
+    throw new Error(errorData.message || `An error occurred: ${res.statusText}`);
   }
   return res.json();
 }
@@ -45,11 +62,8 @@ export async function updateContent(
   data: { title: string; content: string; summary?: string; tags: string[] }
 ): Promise<Content> {
   const url = `${API_BASE_URL}/contents/${type}/${slug}`;
-  const res = await fetch(url, {
+  const res = await apiFetch(url, {
     method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
     body: JSON.stringify(data),
   });
 
@@ -64,11 +78,8 @@ export async function createContent(
   data: { slug: string; title: string; summary?: string; content: string; tags: string[] }
 ): Promise<Content> {
   const url = `${API_BASE_URL}/contents/${type}`;
-  const res = await fetch(url, {
+  const res = await apiFetch(url, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
     body: JSON.stringify(data),
   });
 
@@ -82,19 +93,16 @@ export async function createContent(
 
 export async function deleteContent(type: string, slug: string): Promise<void> {
   const url = `${API_BASE_URL}/contents/${type}/${slug}`;
-  const res = await fetch(url, { method: 'DELETE' });
+  const res = await apiFetch(url, { method: 'DELETE' });
   if (!res.ok && res.status !== 204) {
     throw new Error(`Failed to delete content: ${res.statusText}`);
   }
 }
 
-export async function login(credentials: AuthRequest): Promise<AuthResponse> {
+export async function login(credentials: AuthRequest): Promise<void> {
   const url = `${API_BASE_URL}/auth/login`;
-  const res = await fetch(url, {
+  const res = await apiFetch(url, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
     body: JSON.stringify(credentials),
   });
 
@@ -102,5 +110,4 @@ export async function login(credentials: AuthRequest): Promise<AuthResponse> {
     const errorData = await res.json().catch(() => ({ message: res.statusText }));
     throw new Error(errorData.message || 'Invalid credentials');
   }
-  return res.json();
 }

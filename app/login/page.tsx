@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { login } from "@/lib/api-client";
-import Cookies from 'js-cookie';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -17,8 +16,7 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const { token } = await login({ email, password });
-      Cookies.set('token', token, { expires: 1, path: '/', secure: process.env.NODE_ENV === 'production' });
+      await login({ email, password });
       router.replace("/admin/articles");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "An unknown error occurred");
