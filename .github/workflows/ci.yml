@@ -47,13 +47,37 @@ jobs:
           name: surefire-reports
           path: backend/target/surefire-reports/
           retention-days: 30
+      - name: Filter paths
+        id: paths-filter
+        uses: dorny/paths-filter@v3.0.2
+        with:
+          filters: |
+            backend:
+              - 'backend/**'
+            frontend:
+              - 'app/**'
+              - 'components/**'
+              - 'public/**'
+              - 'styles/**'
+              - 'types/**'
+              - 'next.config.ts'
+              - 'package.json'
+              - 'postcss.config.mjs'
+              - 'tailwind.config.js'
+              - 'tsconfig.json'
+
+      - name: Set execute permission for mvnw
+        if: steps.paths-filter.outputs.backend == 'true'
+        run: chmod +x mvnw
+
       - name: Dependency Check
+        if: steps.paths-filter.outputs.backend == 'true' && github.event_name == 'pull_request'
         working-directory: backend
         env:
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
         run: |
-          ../mvnw org.owasp:dependency-check-maven:purge
-          ../mvnw org.owasp:dependency-check-maven:check
+          ${{ github.workspace }}/mvnw org.owasp:dependency-check-maven:purge
+          ${{ github.workspace }}/mvnw org.owasp:dependency-check-maven:check
 
   e2e-test:
     runs-on: ubuntu-latest
