@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,6 +28,12 @@ import lombok.RequiredArgsConstructor;
 @Profile("!test")
 public class DataInitializer implements CommandLineRunner {
 
+    @Value("${app.admin.email}")
+    private String adminEmail;
+
+    @Value("${app.admin.password}")
+    private String adminPassword;
+
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final ContentRepository contentRepository;
@@ -44,12 +51,12 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         // Create admin user
-        if (userRepository.findByEmail("admin@example.com").isEmpty()) {
+        if (userRepository.findByEmail(adminEmail).isEmpty()) {
             Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
                     .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
             User admin = User.builder()
-                    .email("admin@example.com")
-                    .password(passwordEncoder.encode("password"))
+                    .email(adminEmail)
+                    .password(passwordEncoder.encode(adminPassword))
                     .roles(Set.of(adminRole))
                     .build();
             userRepository.save(admin);
