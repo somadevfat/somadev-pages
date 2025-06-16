@@ -696,15 +696,31 @@ Playwright E2E テストが期待する `data-testid` と実際の管理画面 U
 
 - **ステータス:** **計画完了** (Ready for Implementation)
 
-### 🎟️ チケット CI-01: 依存関係の脆弱性スキャン (Level 2)
+### 🎟️ チケット CI-01: 依存関係の脆弱性スキャン
 
-- **担当:** DevOps
-- **ブランチ:** `feature/CI-01-vulnerability-scan`
-- **説明:** CI/CDパイプラインに、既知の脆弱性を持つ依存ライブラリを検出するステップを追加します。
+- **担当:** CI/CD
+- **ブランチ:** `fix/ci-final-vulnerability-scan`
+- **説明:** CI/CDパイプラインに依存関係の脆弱性スキャンを追加し、セキュリティ強化を図ります。
+- **Input:**
+    - `backend/pom.xml` に `dependency-check-maven` プラグインを追加。
+    - `.github/workflows/ci.yml` にスキャン実行ステップを追加。
 - **Output:**
-    - [ ] `pom.xml`に`dependency-check-maven`プラグインを設定する。
-    - [ ] GitHub Actionsのワークフローに、`mvn dependency-check:check`を実行するステップを追加する。
-    - [ ] 脆弱性が発見された場合にビルドが失敗するように設定する。
+    - Pull Request作成時に、バックエンドの依存関係に対して脆弱性スキャンが自動実行される。
+    - CVSS 7以上の脆弱性が検出された場合、ビルドが失敗する。
+    - スキャン結果がCIログで確認できる。
+- **進捗状況:**
+  - ✅ `pom.xml`に`dependency-check-maven`プラグイン（バージョン10.0.4）を追加
+  - ✅ `.github/workflows/ci.yml`にスキャン実行ステップを追加
+  - ✅ 複数の技術的問題を解決:
+    - バージョン12.x系のバグによるNullPointerExceptionを回避するため、安定版10.0.4にダウングレード
+    - Maven Wrapperの実行権限問題を解決
+    - 改行コード問題（CRLF→LF変換）を解決するため、dos2unixインストールとsedフォールバックを実装
+  - 🔄 **現在:** 最新の修正をプッシュ済み、CI実行結果待ち
+- **技術的課題と解決策:**
+  1. **dependency-check-maven 12.x系のバグ:** NVD APIからの空レスポンスでNullPointerException → 安定版10.0.4にダウングレード
+  2. **Maven Wrapper実行権限:** GitHub Actionsでmvnwに実行権限がない → chmodで権限付与
+  3. **改行コード問題:** Windows形式(CRLF)の改行コードでLinux実行時エラー → dos2unix/sedで変換
+- **ステータス:** **実行中** (最終テスト段階)
 
 ---
 
