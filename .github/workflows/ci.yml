@@ -54,7 +54,7 @@ jobs:
         if: env.NVD_API_KEY != ''
         run: |
           ./mvnw org.owasp:dependency-check-maven:purge
-          ./mvnw -X org.owasp:dependency-check-maven:check
+          ./mvnw org.owasp:dependency-check-maven:check -f backend/pom.xml
 
   e2e-test:
     runs-on: ubuntu-latest
