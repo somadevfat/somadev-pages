@@ -441,11 +441,11 @@ Playwright E2E テストが期待する `data-testid` と実際の管理画面 U
 - **メタデータ JSON の肥大化**: 検索性確保のため、将来は `tags` 用サブテーブルを検討。
 
 #### 8. Creative Phase Components
-- 今回はシンプル UI 採用のため CREATIVE フェーズ不要。
+- 今回はシンプル UI 採用のため CREATIVE フェーズ不要、直接実装に進む
 
 ---
 
-⏭️ NEXT MODE: IMPLEMENT MODE (直接実装に進めます)
+⏭️ NEXT MODE: IMPLEMENT MODE
 
 ## 🎯 UI 改善: 管理画面レイアウト整理 (Level 2)
 
@@ -630,9 +630,10 @@ Playwright E2E テストが期待する `data-testid` と実際の管理画面 U
 - **ブランチ:** `feature/BE-08-rate-limiting`
 - **説明:** ブルートフォース攻撃を防ぐため、認証エンドポイントにレートリミットを導入します。
 - **Output:**
-    - [ ] `bucket4j`などのライブラリを`pom.xml`に追加する。
-    - [ ] `/api/auth/login`エンドポイントに対して、IPアドレスごとに一定時間内の試行回数制限を設ける。
-    - [ ] 制限を超えた場合にHTTPステータスコード`429 Too Many Requests`を返す。
+    - [x] `bucket4j`などのライブラリを`pom.xml`に追加する。
+    - [x] `/api/auth/login`エンドポイントに対して、IPアドレスごとに一定時間内の試行回数制限を設ける。
+    - [x] 制限を超えた場合にHTTPステータスコード`429 Too Many Requests`を返す。
+- **ステータス:** 完了
 
 ### 🎟️ チケット BE-09: ロールベースアクセス制御(RBAC)の実装 (Level 3)
 
@@ -645,6 +646,55 @@ Playwright E2E テストが期待する `data-testid` と実際の管理画面 U
     - [ ] `CustomUserDetailsService`がユーザーのロール情報を正しく`GrantedAuthority`として読み込むように修正する。
     - [ ] コンテンツの作成・更新・削除など、管理者権限が必要なAPIエンドポイントに`@PreAuthorize("hasRole('ADMIN')")`アノテーションを追加してアクセスを制限する。
     - [ ] 権限がない場合にHTTPステータスコード`403 Forbidden`が返ることを確認するテストを追加する。
+
+#### 📝 Level 3 計画ドキュメント (BE-09)
+
+##### 1. Requirements Analysis (要件分析)
+- **コア要件:**
+    - `ADMIN`と`USER`の2つの役割（Role）を定義する。
+    - ユーザー(User)と役割(Role)を多対多で関連付ける。
+    - APIエンドポイントごとに、必要な役割（例: `ADMIN`のみ）を設定してアクセスを制限できるようにする。
+    - 権限がないアクセスに対しては、HTTPステータスコード `403 Forbidden` を返す。
+- **技術的制約:**
+    - Spring Securityの `@PreAuthorize` アノテーションまたは同等のメカニズムを利用する。
+    - 既存のJWT認証フローと連携させる。トークン内に役割情報を含める。
+
+##### 2. Components Affected (影響を受けるコンポーネント)
+- `com.soma.backend.entity.User`: `Role`エンティティとの関連付けを追加。
+- `com.soma.backend.security.CustomUserDetailsService`: JWT生成/検証時に役割情報を読み込むように修正。
+- `com.soma.backend.security.JwtTokenProvider` (または同等のクラス): トークンのクレームに役割情報を含めるように修正。
+- `com.soma.backend.controller.ContentController`: `CUD` (作成、更新、削除) 操作を行うエンドポイントにアクセス制限を追加。
+- `com.soma.backend.config.SecurityConfig`: メソッドレベルのセキュリティを有効化する設定を追加。
+- `com.soma.backend.DataInitializer`: `ADMIN`ロールを持つ初期ユーザーを作成するロジックを追加。
+- **新規作成:**
+    - `com.soma.backend.entity.Role`: 役割を表現するJPAエンティティ。
+    - `com.soma.backend.repository.RoleRepository`: `Role`エンティティのJPAリポジトリ。
+
+##### 3. Architecture Considerations (アーキテクチャに関する考慮事項)
+- `Role`エンティティには `id` と `name` (例: `ROLE_ADMIN`) を持たせる。
+- `User`エンティティには `Set<Role> roles` のような形で関連を定義する。
+- データベース起動時に`DataInitializer`で`ADMIN`と`USER`のロールがDBに存在することを確認し、なければ作成する。
+- JWTのペイロードに `roles: ["ROLE_ADMIN"]` のような形で役割のリストを含める。これにより、リクエストごとにDBへ問い合わせることなく認可チェックが可能になる。
+
+##### 4. Implementation Strategy (実装戦略)
+1.  **ドメイン層の実装:**
+    -   [ ] `Role`エンティティと`RoleRepository`を作成する。
+    -   [ ] `User`エンティティに`Role`との関連（`@ManyToMany`）を追加する。
+2.  **セキュリティ設定の更新:**
+    -   [ ] `SecurityConfig`で `@EnableGlobalMethodSecurity(prePostEnabled = true)` を有効化する。
+    -   [ ] `JwtTokenProvider`を修正し、JWT作成時にユーザーの役割をクレームに追加する。
+    -   [ ] `CustomUserDetailsService`を修正し、`UserDetails`オブジェクトに`GrantedAuthority`として役割情報を設定する。
+3.  **アクセス制御の適用:**
+    -   [ ] `ContentController`の`create`, `update`, `delete`のエンドポイントに `@PreAuthorize("hasRole('ADMIN')")` を追加する。
+4.  **データ初期化:**
+    -   [ ] `DataInitializer`で`ADMIN`ロールを持つユーザーを初期データとして投入するように修正する。
+5.  **テスト:**
+    -   [ ] 管理者権限を持つユーザーと持たないユーザーで保護されたAPIを呼び出し、それぞれ `200 OK` と `403 Forbidden` が返ることを確認するテストケースを追加する。
+
+##### 5. Creative Phase Components (クリエイティブフェーズが必要なコンポーネント)
+- このタスクは、確立されたセキュリティパターン（RBAC）の実装であり、新規のUI/UX設計や複雑なアルゴリズム設計を必要としないため、**クリエイティブフェーズは不要**です。
+
+- **ステータス:** **計画完了** (Ready for Implementation)
 
 ### 🎟️ チケット CI-01: 依存関係の脆弱性スキャン (Level 2)
 
