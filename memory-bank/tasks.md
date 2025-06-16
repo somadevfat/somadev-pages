@@ -613,13 +613,16 @@ Playwright E2E テストが期待する `data-testid` と実際の管理画面 U
 - **ブランチ:** `feature/BE-07-security-hardening`
 - **説明:** バックエンドの基本的なセキュリティ設定を強化し、フロントエンドの認証メカニズムをより安全な方式に更新します。
 - **Output:**
-    - [ ] **シークレット管理:** JWT署名キーを`application.properties`に移動し、環境変数から読み込めるようにする (`@Value("${app.jwt.secret}")`)。
+    - [x] **シークレット管理:** JWT署名キーを`application.properties`に移動し、環境変数から読み込めるようにする (`@Value("${app.jwt.secret}")`)。
+    - [x] **Docker環境修正:** `application-prod.properties`を分離し、`docker-compose.yml`に必要な環境変数を追加。
+    - [x] **データ初期化:** `DataInitializer`にダミーコンテンツ作成機能を追加してAPI動作確認を可能にする。
     - [ ] **セキュアなCookie:**
         - [ ] `AuthController`の`/login`エンドポイントは、JWTをレスポンスボディで返す代わりに、`HttpOnly`, `Secure`, `SameSite=Strict`属性を持つCookieとして設定するように変更する。
         - [ ] フロントエンドのログイン処理を、レスポンスのCookieを自動的にブラウザに保存する方式に変更する。
         - [ ] フロントエンドのAPIクライアントから、手動で`Authorization`ヘッダーを付与する処理を削除する（Cookieは自動で送信されるため）。
-    - [ ] **グローバル例外処理:** `@RestControllerAdvice`を使用してグローバルな例外ハンドラを実装し、スタックトレースなどの詳細なエラー情報がクライアントに漏洩しないようにする。
-    - [ ] **セキュリティヘッダー:** Spring Securityの設定で、`X-Content-Type-Options`, `Content-Security-Policy`, `Strict-Transport-Security`などのセキュリティ関連HTTPヘッダーを追加する。
+    - [x] **グローバル例外処理:** `@RestControllerAdvice`を使用してグローバルな例外ハンドラを実装し、スタックトレースなどの詳細なエラー情報がクライアントに漏洩しないようにする。
+    - [x] **セキュリティヘッダー:** Spring Securityの設定で、`X-Content-Type-Options`, `Content-Security-Policy`, `Strict-Transport-Security`などのセキュリティ関連HTTPヘッダーを追加する。
+- **ステータス:** **部分完了** (Docker環境とJWT設定の修正完了、セキュアCookie実装は継続中)
 
 ### 🎟️ チケット BE-08: レートリミットの実装 (Level 2)
 
@@ -652,3 +655,63 @@ Playwright E2E テストが期待する `data-testid` と実際の管理画面 U
     - [ ] `pom.xml`に`dependency-check-maven`プラグインを設定する。
     - [ ] GitHub Actionsのワークフローに、`mvn dependency-check:check`を実行するステップを追加する。
     - [ ] 脆弱性が発見された場合にビルドが失敗するように設定する。
+
+---
+
+## 🔍 QA調査記録: Docker環境でのJWT設定問題 (2025-06-16)
+
+### 問題の概要
+`docker-compose up`実行時にバックエンドコンテナが起動に失敗し、以下のエラーが発生：
+```
+Could not resolve placeholder 'app.jwt.secret' in value "${app.jwt.secret}"
+```
+
+### 根本原因の調査
+1. **初期仮説**: JWT秘密鍵の設定が不足
+2. **実際の原因**: 
+   - Docker環境で`prod`プロファイルを使用しているが、`application.properties`内の`prod`プロファイル設定にJWT秘密鍵が含まれていなかった
+   - `docker-compose.yml`でデータベース接続情報とJWT秘密鍵の環境変数が設定されていなかった
+
+### 解決策の実装
+1. **`application-prod.properties`の分離**:
+   - 本番環境用の設定を独立したファイルに分離
+   - JWT秘密鍵を環境変数から読み込むように設定: `app.jwt.secret=${JWT_SECRET:DefaultSecretKeyIsVeryLongAndShouldBeChangedInProductionEnvironment}`
+
+2. **`docker-compose.yml`の環境変数追加**:
+   ```yaml
+   environment:
+     - SPRING_PROFILES_ACTIVE=prod
+     - DB_URL=jdbc:postgresql://db:5432/soma_db
+     - DB_USERNAME=soma
+     - DB_PASSWORD=password
+     - JWT_SECRET=ProductionSecretKeyThatShouldBeChangedInRealDeployment123456789
+   ```
+
+3. **`DataInitializer`の拡張**:
+   - ダミーコンテンツ作成機能を追加してAPI動作確認を可能にした
+   - `dummy-post`記事を自動作成し、`GET /api/contents/articles/dummy-post`でテスト可能
+
+### 検証結果
+- ✅ バックエンドコンテナが正常に起動
+- ✅ データベース接続が成功
+- ✅ JWT認証システムが動作
+- ✅ API エンドポイントが正常にレスポンス:
+  ```json
+  {
+    "slug": "dummy-post",
+    "metadata": {
+      "title": "Dummy Post",
+      "date": "2025-06-16",
+      "dateTime": "2025-06-16T05:55:30.553453242",
+      "summary": "A test post for API verification",
+      "tags": ["test", "dummy", "api"]
+    },
+    "body": "This is a dummy post for testing the API..."
+  }
+  ```
+
+### 学習ポイント
+- Spring Bootのプロファイル設定は`application-{profile}.properties`形式が推奨
+- Docker環境では環境変数による設定上書きが重要
+- GlobalExceptionHandlerがエラー詳細を隠すため、ログ確認が必要
+- 本番環境とテスト環境でのデータ初期化戦略の重要性
