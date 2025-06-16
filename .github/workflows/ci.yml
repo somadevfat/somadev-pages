@@ -48,7 +48,7 @@ jobs:
         restore-keys: ${{ runner.os }}-m2
     
     - name: Run backend tests
-      run: cd backend && ./mvnw test
+      run: mvn -B test -f backend/pom.xml
     
     - name: Upload surefire reports
       if: always()
@@ -57,6 +57,10 @@ jobs:
         name: surefire-reports
         path: backend/target/surefire-reports/
         retention-days: 30
+
+    - name: Dependency Check
+      if: secrets.NVD_API_KEY != ''
+      run: mvn -B -DskipTests org.owasp:dependency-check-maven:check -f backend/pom.xml
 
   e2e-test:
     runs-on: ubuntu-latest
