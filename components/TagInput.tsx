@@ -52,13 +52,14 @@ export default function TagInput({ tags, onChange, placeholder = 'Add a tag...',
 
   // 入力欄外クリック時にフォーカスが当たるようマウント時にイベントを設定
   useEffect(() => {
-    if (containerRef.current) {
-      containerRef.current.addEventListener('click', handleContainerClick);
+    const container = containerRef.current;
+    if (container) {
+      container.addEventListener('click', handleContainerClick);
     }
 
     return () => {
-      if (containerRef.current) {
-        containerRef.current.removeEventListener('click', handleContainerClick);
+      if (container) {
+        container.removeEventListener('click', handleContainerClick);
       }
     };
   }, []);
