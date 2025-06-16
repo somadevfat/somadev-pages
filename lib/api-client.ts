@@ -1,5 +1,5 @@
 import { Content } from '@/types/content';
-import { AuthRequest, AuthResponse } from '@/types/auth';
+import { AuthRequest } from '@/types/auth';
 
 // サーバーサイド（Node.js）かクライアントサイド（ブラウザ）かを判定
 const isServer = typeof window === 'undefined';
