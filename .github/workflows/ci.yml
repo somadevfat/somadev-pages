@@ -68,7 +68,10 @@ jobs:
 
       - name: Set execute permission for mvnw
         if: steps.paths-filter.outputs.backend == 'true'
-        run: chmod +x mvnw
+        working-directory: backend
+        run: |
+          dos2unix mvnw
+          chmod +x mvnw
 
       - name: Dependency Check
         if: steps.paths-filter.outputs.backend == 'true' && github.event_name == 'pull_request'
@@ -76,8 +79,8 @@ jobs:
         env:
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
         run: |
-          ${{ github.workspace }}/mvnw org.owasp:dependency-check-maven:purge
-          ${{ github.workspace }}/mvnw org.owasp:dependency-check-maven:check
+          ./mvnw org.owasp:dependency-check-maven:purge
+          ./mvnw org.owasp:dependency-check-maven:check
 
   e2e-test:
     runs-on: ubuntu-latest
