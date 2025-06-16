@@ -60,7 +60,9 @@ jobs:
 
     - name: Dependency Check
       if: secrets.NVD_API_KEY != ''
-      run: mvn -B -DskipTests org.owasp:dependency-check-maven:check -f backend/pom.xml
+      env:
+        NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+      run: mvn -B -DskipTests -DnvdApiKey=${{ secrets.NVD_API_KEY }} org.owasp:dependency-check-maven:check -f backend/pom.xml
 
   e2e-test:
     runs-on: ubuntu-latest
