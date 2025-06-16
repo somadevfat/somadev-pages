@@ -56,13 +56,22 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 The backend server runs in a Docker container. Make sure you have Docker and Docker Compose installed.
 
+Before starting the server for the first time, you need to set up your environment variables.
+
+1.  Copy the example environment file:
+    ```bash
+    cp env.example.txt .env
+    ```
+
+2.  Open the newly created `.env` file and replace the placeholder values (e.g., `your_secure_password_here`) with your actual secret values.
+
 To start the backend server, run the following command in the project root directory:
 
 ```bash
-docker-compose up
+docker-compose up -d --build
 ```
 
-The backend API will be available at `http://localhost:8080`.
+The backend API will be available at `http://localhost:8081`.
 
 ### Building for Production
 
