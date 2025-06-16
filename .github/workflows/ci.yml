@@ -52,7 +52,9 @@ jobs:
         env:
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
         if: env.NVD_API_KEY != ''
-        run: ./mvnw org.owasp:dependency-check-maven:check
+        run: |
+          ./mvnw org.owasp:dependency-check-maven:purge
+          ./mvnw org.owasp:dependency-check-maven:check
 
   e2e-test:
     runs-on: ubuntu-latest
@@ -132,4 +134,4 @@ jobs:
           file: ./backend/Dockerfile
           push: true
           tags: ${{ steps.meta_backend.outputs.tags }}
-          labels: ${{ steps.meta_backend.outputs.labels }} 
+          labels: ${{ steps.meta_backend.outputs.labels }}
