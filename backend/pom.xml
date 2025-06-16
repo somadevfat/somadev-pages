@@ -176,9 +176,6 @@
 				<version>9.2.0</version>
 				<configuration>
 					<failBuildOnCVSS>8</failBuildOnCVSS>
-					<nvd>
-						<apiKey>${env.NVD_API_KEY}</apiKey>
-					</nvd>
 				</configuration>
 				<executions>
 					<execution>
