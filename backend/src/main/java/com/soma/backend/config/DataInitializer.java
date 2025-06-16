@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
@@ -12,8 +13,11 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.soma.backend.entity.Content;
+import com.soma.backend.entity.ERole;
+import com.soma.backend.entity.Role;
 import com.soma.backend.entity.User;
 import com.soma.backend.repository.ContentRepository;
+import com.soma.backend.repository.RoleRepository;
 import com.soma.backend.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -24,20 +28,32 @@ import lombok.RequiredArgsConstructor;
 public class DataInitializer implements CommandLineRunner {
 
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final ContentRepository contentRepository;
     private final PasswordEncoder passwordEncoder;
     private final ObjectMapper objectMapper;
 
     @Override
     public void run(String... args) throws Exception {
+        // Initialize roles
+        if (roleRepository.findByName(ERole.ROLE_ADMIN).isEmpty()) {
+            roleRepository.save(new Role(ERole.ROLE_ADMIN));
+        }
+        if (roleRepository.findByName(ERole.ROLE_USER).isEmpty()) {
+            roleRepository.save(new Role(ERole.ROLE_USER));
+        }
+
         // Create admin user
-            if (userRepository.findByEmail("admin@example.com").isEmpty()) {
-                User admin = User.builder()
-                        .email("admin@example.com")
-                        .password(passwordEncoder.encode("password"))
-                        .build();
-                userRepository.save(admin);
-            }
+        if (userRepository.findByEmail("admin@example.com").isEmpty()) {
+            Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
+                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+            User admin = User.builder()
+                    .email("admin@example.com")
+                    .password(passwordEncoder.encode("password"))
+                    .roles(Set.of(adminRole))
+                    .build();
+            userRepository.save(admin);
+        }
 
         // Create dummy content for testing
         if (contentRepository.findByTypeAndSlug("articles", "dummy-post").isEmpty()) {

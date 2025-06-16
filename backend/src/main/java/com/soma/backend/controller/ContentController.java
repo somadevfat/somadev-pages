@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -47,18 +48,21 @@ public class ContentController {
     }
 
     @PostMapping("/{type}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ContentDto> createContent(@PathVariable String type, @RequestBody ContentCreateRequestDto createDto) {
         ContentDto createdContent = contentService.createContent(type, createDto);
         return new ResponseEntity<>(createdContent, HttpStatus.CREATED);
     }
 
     @PutMapping("/{type}/{slug}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ContentDto> updateContent(@PathVariable String type, @PathVariable String slug, @RequestBody ContentUpdateRequestDto updateDto) {
         ContentDto updatedContent = contentService.updateContent(type, slug, updateDto);
         return ResponseEntity.ok(updatedContent);
     }
 
     @DeleteMapping("/{type}/{slug}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteContent(@PathVariable String type, @PathVariable String slug) {
         contentService.deleteContent(type, slug);
         return ResponseEntity.noContent().build();
