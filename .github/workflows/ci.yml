@@ -70,7 +70,16 @@ jobs:
         if: steps.paths-filter.outputs.backend == 'true'
         working-directory: backend
         run: |
-          dos2unix mvnw
+          # Install dos2unix or use sed as fallback
+          sudo apt-get update && sudo apt-get install -y dos2unix || echo "dos2unix installation failed, using sed fallback"
+          
+          # Convert line endings using dos2unix or sed
+          if command -v dos2unix >/dev/null 2>&1; then
+            dos2unix mvnw
+          else
+            sed -i 's/\r$//' mvnw
+          fi
+          
           chmod +x mvnw
 
       - name: Dependency Check
