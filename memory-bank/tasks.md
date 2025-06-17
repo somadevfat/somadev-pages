@@ -174,11 +174,11 @@
 - **ブランチ:** `feature/FE-09-admin-route-guard`
 - **説明:** 未認証ユーザーが管理画面にアクセスできないように保護し、ログアウト機能を実装する。
 - **Output:**
-  - [ ] `/admin/**` へのアクセスを検証する`middleware.ts`を作成する。
-  - [ ] 未認証の場合、`/login`へリダイレクトさせる。
-  - [ ] 管理画面のレイアウトにログアウトボタンを設置する。
-  - [ ] ログアウトボタンクリック時、Cookieを削除し`/login`へリダイレクトさせる。
-  - [ ] ルートガードとログアウト機能を検証するE2Eテストを追加する。
+  - [x] `/admin/**` へのアクセスを検証する`middleware.ts`を作成する。
+  - [x] 未認証の場合、`/login`へリダイレクトさせる。
+  - [x] 管理画面のレイアウトにログアウトボタンを設置する。
+  - [x] ログアウトボタンクリック時、Cookieを削除し`/login`へリダイレクトさせる。
+  - [x] ルートガードとログアウト機能を検証するE2Eテストを追加する。
 - **ステータス:** **完了**
 
 ---
@@ -441,11 +441,11 @@ Playwright E2E テストが期待する `data-testid` と実際の管理画面 U
 - **メタデータ JSON の肥大化**: 検索性確保のため、将来は `tags` 用サブテーブルを検討。
 
 #### 8. Creative Phase Components
-- 今回はシンプル UI 採用のため CREATIVE フェーズ不要。
+- 今回はシンプル UI 採用のため CREATIVE フェーズ不要、直接実装に進む
 
 ---
 
-⏭️ NEXT MODE: IMPLEMENT MODE (直接実装に進めます)
+⏭️ NEXT MODE: IMPLEMENT MODE
 
 ## 🎯 UI 改善: 管理画面レイアウト整理 (Level 2)
 
@@ -569,6 +569,7 @@ Playwright E2E テストが期待する `data-testid` と実際の管理画面 U
   - `PasswordEncoder` に `BCrypt`
   - JWT 署名鍵を `application.properties` で管理（Secrets 上書き可）。
   - 統合テスト：正しい資格情報で 200 / 誤認証で 401 を確認。
+- **ステータス:** 完了
 
 ### 🎟️ チケット FE-08: ログイン画面の実装
 - **担当:** Frontend
@@ -588,14 +589,212 @@ Playwright E2E テストが期待する `data-testid` と実際の管理画面 U
 - **ブランチ:** `feature/FE-09-admin-route-guard`
 - **説明:** 未認証ユーザーが管理画面にアクセスできないように保護し、ログアウト機能を実装する。
 - **Output:**
-  - [ ] `/admin/**` へのアクセスを検証する`middleware.ts`を作成する。
-  - [ ] 未認証の場合、`/login`へリダイレクトさせる。
-  - [ ] 管理画面のレイアウトにログアウトボタンを設置する。
-  - [ ] ログアウトボタンクリック時、Cookieを削除し`/login`へリダイレクトさせる。
-  - [ ] ルートガードとログアウト機能を検証するE2Eテストを追加する。
+  - [x] `/admin/**` へのアクセスを検証する`middleware.ts`を作成する。
+  - [x] 未認証の場合、`/login`へリダイレクトさせる。
+  - [x] 管理画面のレイアウトにログアウトボタンを設置する。
+  - [x] ログアウトボタンクリック時、Cookieを削除し`/login`へリダイレクトさせる。
+  - [x] ルートガードとログアウト機能を検証するE2Eテストを追加する。
 - **ステータス:** **完了**
 
 ### TODO Checklist (Auth Phase)
-- [ ] BE-06: JWT 認証 API
-- [ ] FE-08: ログイン画面
-- [ ] FE-09: 管理画面ルートガード
+- [x] BE-06: JWT 認証 API
+- [x] FE-08: ログイン画面
+- [x] FE-09: 管理画面ルートガード
+
+---
+
+## フェーズ6: セキュリティ強化 (Security Hardening)
+
+このフェーズでは、アプリケーションの堅牢性を高め、一般的なウェブの脅威から保護するための改善を行います。
+
+### 🎟️ チケット BE-07: バックエンド基礎セキュリティ強化 (Level 3)
+
+- **担当:** Backend, Frontend
+- **ブランチ:** `feature/BE-07-security-hardening`
+- **説明:** バックエンドの基本的なセキュリティ設定を強化し、フロントエンドの認証メカニズムをより安全な方式に更新します。
+- **Output:**
+    - [x] **シークレット管理:** JWT署名キーを`application.properties`に移動し、環境変数から読み込めるようにする (`@Value("${app.jwt.secret}")`)。
+    - [x] **Docker環境修正:** `application-prod.properties`を分離し、`docker-compose.yml`に必要な環境変数を追加。
+    - [x] **データ初期化:** `DataInitializer`にダミーコンテンツ作成機能を追加してAPI動作確認を可能にする。
+    - [ ] **セキュアなCookie:**
+        - [ ] `AuthController`の`/login`エンドポイントは、JWTをレスポンスボディで返す代わりに、`HttpOnly`, `Secure`, `SameSite=Strict`属性を持つCookieとして設定するように変更する。
+        - [ ] フロントエンドのログイン処理を、レスポンスのCookieを自動的にブラウザに保存する方式に変更する。
+        - [ ] フロントエンドのAPIクライアントから、手動で`Authorization`ヘッダーを付与する処理を削除する（Cookieは自動で送信されるため）。
+    - [x] **グローバル例外処理:** `@RestControllerAdvice`を使用してグローバルな例外ハンドラを実装し、スタックトレースなどの詳細なエラー情報がクライアントに漏洩しないようにする。
+    - [x] **セキュリティヘッダー:** Spring Securityの設定で、`X-Content-Type-Options`, `Content-Security-Policy`, `Strict-Transport-Security`などのセキュリティ関連HTTPヘッダーを追加する。
+- **ステータス:** **部分完了** (Docker環境とJWT設定の修正完了、セキュアCookie実装は継続中)
+
+### 🎟️ チケット BE-08: レートリミットの実装 (Level 2)
+
+- **担当:** Backend
+- **ブランチ:** `feature/BE-08-rate-limiting`
+- **説明:** ブルートフォース攻撃を防ぐため、認証エンドポイントにレートリミットを導入します。
+- **Output:**
+    - [x] `bucket4j`などのライブラリを`pom.xml`に追加する。
+    - [x] `/api/auth/login`エンドポイントに対して、IPアドレスごとに一定時間内の試行回数制限を設ける。
+    - [x] 制限を超えた場合にHTTPステータスコード`429 Too Many Requests`を返す。
+- **ステータス:** 完了
+
+### 🎟️ チケット BE-09: ロールベースアクセス制御(RBAC)の実装 (Level 3)
+
+- **担当:** Backend
+- **ブランチ:** `feature/BE-09-rbac-implementation`
+- **説明:** ユーザーの役割に基づいてAPIへのアクセスを制御する仕組みを導入します。
+- **Output:**
+    - [x] `Role`エンティティ（例: `ROLE_ADMIN`, `ROLE_USER`）を作成し、`User`エンティティと多対多の関連付けを行う。
+    - [x] データ初期化時に管理者ユーザーを作成する仕組みを用意する（`CommandLineRunner`など）。
+    - [x] `CustomUserDetailsService`がユーザーのロール情報を正しく`GrantedAuthority`として読み込むように修正する。
+    - [x] コンテンツの作成・更新・削除など、管理者権限が必要なAPIエンドポイントに`@PreAuthorize("hasRole('ADMIN')")`アノテーションを追加してアクセスを制限する。
+    - [x] 権限がない場合にHTTPステータスコード`403 Forbidden`が返ることを確認するテストを追加する。
+
+#### 📝 Level 3 計画ドキュメント (BE-09)
+
+##### 1. Requirements Analysis (要件分析)
+- **コア要件:**
+    - `ADMIN`と`USER`の2つの役割（Role）を定義する。
+    - ユーザー(User)と役割(Role)を多対多で関連付ける。
+    - APIエンドポイントごとに、必要な役割（例: `ADMIN`のみ）を設定してアクセスを制限できるようにする。
+    - 権限がないアクセスに対しては、HTTPステータスコード `403 Forbidden` を返す。
+- **技術的制約:**
+    - Spring Securityの `@PreAuthorize` アノテーションまたは同等のメカニズムを利用する。
+    - 既存のJWT認証フローと連携させる。トークン内に役割情報を含める。
+
+##### 2. Components Affected (影響を受けるコンポーネント)
+- `com.soma.backend.entity.User`: `Role`エンティティとの関連付けを追加。
+- `com.soma.backend.security.CustomUserDetailsService`: JWT生成/検証時に役割情報を読み込むように修正。
+- `com.soma.backend.security.JwtTokenProvider` (または同等のクラス): トークンのクレームに役割情報を含めるように修正。
+- `com.soma.backend.controller.ContentController`: `CUD` (作成、更新、削除) 操作を行うエンドポイントにアクセス制限を追加。
+- `com.soma.backend.config.SecurityConfig`: メソッドレベルのセキュリティを有効化する設定を追加。
+- `com.soma.backend.DataInitializer`: `ADMIN`ロールを持つ初期ユーザーを作成するロジックを追加。
+- **新規作成:**
+    - `com.soma.backend.entity.Role`: 役割を表現するJPAエンティティ。
+    - `com.soma.backend.repository.RoleRepository`: `Role`エンティティのJPAリポジトリ。
+
+##### 3. Architecture Considerations (アーキテクチャに関する考慮事項)
+- `Role`エンティティには `id` と `name` (例: `ROLE_ADMIN`) を持たせる。
+- `User`エンティティには `Set<Role> roles` のような形で関連を定義する。
+- データベース起動時に`DataInitializer`で`ADMIN`と`USER`のロールがDBに存在することを確認し、なければ作成する。
+- JWTのペイロードに `roles: ["ROLE_ADMIN"]` のような形で役割のリストを含める。これにより、リクエストごとにDBへ問い合わせることなく認可チェックが可能になる。
+
+##### 4. Implementation Strategy (実装戦略)
+1.  **ドメイン層の実装:**
+    -   [x] `Role`エンティティと`RoleRepository`を作成する。
+    -   [x] `User`エンティティに`Role`との関連（`@ManyToMany`）を追加する。
+2.  **セキュリティ設定の更新:**
+    -   [x] `SecurityConfig`で `@EnableGlobalMethodSecurity(prePostEnabled = true)` を有効化する。
+    -   [x] `JwtTokenProvider`を修正し、JWT作成時にユーザーの役割をクレームに追加する。
+    -   [x] `CustomUserDetailsService`を修正し、`UserDetails`オブジェクトに`GrantedAuthority`として役割情報を設定する。
+3.  **アクセス制御の適用:**
+    -   [x] `ContentController`の`create`, `update`, `delete`のエンドポイントに `@PreAuthorize("hasRole('ADMIN')")` を追加する。
+4.  **データ初期化:**
+    -   [x] `DataInitializer`で`ADMIN`ロールを持つユーザーを初期データとして投入するように修正する。
+5.  **テスト:**
+    -   [x] 管理者権限を持つユーザーと持たないユーザーで保護されたAPIを呼び出し、それぞれ `200 OK` と `403 Forbidden` が返ることを確認するテストケースを追加する。
+
+##### 5. Creative Phase Components (クリエイティブフェーズが必要なコンポーネント)
+- このタスクは、確立されたセキュリティパターン（RBAC）の実装であり、新規のUI/UX設計や複雑なアルゴリズム設計を必要としないため、**クリエイティブフェーズは不要**です。
+
+- **ステータス:** **完了**
+
+### 🎟️ チケット CI-01: 依存関係の脆弱性スキャン (Level 2)
+
+- **担当:** DevOps
+- **ブランチ:** `feature/CI-01-vulnerability-scan`
+- **説明:** CI/CDパイプラインに、既知の脆弱性を持つ依存ライブラリを検出するステップを追加します。
+- **Output:**
+    - [ ] `pom.xml`に`dependency-check-maven`プラグインを設定する。
+    - [ ] GitHub Actionsのワークフローに、`mvn dependency-check:check`を実行するステップを追加する。
+    - [ ] 脆弱性が発見された場合にビルドが失敗するように設定する。
+
+---
+
+## 🔍 QA調査記録: Docker環境でのJWT設定問題 (2025-06-16)
+
+### 問題の概要
+`docker-compose up`実行時にバックエンドコンテナが起動に失敗し、以下のエラーが発生：
+```
+Could not resolve placeholder 'app.jwt.secret' in value "${app.jwt.secret}"
+```
+
+### 根本原因の調査
+1. **初期仮説**: JWT秘密鍵の設定が不足
+2. **実際の原因**: 
+   - Docker環境で`prod`プロファイルを使用しているが、`application.properties`内の`prod`プロファイル設定にJWT秘密鍵が含まれていなかった
+   - `docker-compose.yml`でデータベース接続情報とJWT秘密鍵の環境変数が設定されていなかった
+
+### 解決策の実装
+1. **`application-prod.properties`の分離**:
+   - 本番環境用の設定を独立したファイルに分離
+   - JWT秘密鍵を環境変数から読み込むように設定: `app.jwt.secret=${JWT_SECRET:DefaultSecretKeyIsVeryLongAndShouldBeChangedInProductionEnvironment}`
+
+2. **`docker-compose.yml`の環境変数追加**:
+   ```yaml
+   environment:
+     - SPRING_PROFILES_ACTIVE=prod
+     - DB_URL=jdbc:postgresql://db:5432/soma_db
+     - DB_USERNAME=soma
+     - DB_PASSWORD=password
+     - JWT_SECRET=ProductionSecretKeyThatShouldBeChangedInRealDeployment123456789
+   ```
+
+3. **`DataInitializer`の拡張**:
+   - ダミーコンテンツ作成機能を追加してAPI動作確認を可能にした
+   - `dummy-post`記事を自動作成し、`GET /api/contents/articles/dummy-post`でテスト可能
+
+### 検証結果
+- ✅ バックエンドコンテナが正常に起動
+- ✅ データベース接続が成功
+- ✅ JWT認証システムが動作
+- ✅ API エンドポイントが正常にレスポンス:
+  ```json
+  {
+    "slug": "dummy-post",
+    "metadata": {
+      "title": "Dummy Post",
+      "date": "2025-06-16",
+      "dateTime": "2025-06-16T05:55:30.553453242",
+      "summary": "A test post for API verification",
+      "tags": ["test", "dummy", "api"]
+    },
+    "body": "This is a dummy post for testing the API..."
+  }
+  ```
+
+### 学習ポイント
+- Spring Bootのプロファイル設定は`application-{profile}.properties`形式が推奨
+- Docker環境では環境変数による設定上書きが重要
+- GlobalExceptionHandlerがエラー詳細を隠すため、ログ確認が必要
+- 本番環境とテスト環境でのデータ初期化戦略の重要性
+
+## フェーズ7: リリース準備 (Release Preparation)
+
+### 🎟️ チケット INF-01: 本番用PostgreSQLとGitHub Secretsの整備 (Level 3)
+
+- **担当:** DevOps/Backend
+- **ブランチ:** `feature/release-preparation`
+- **説明:** アプリケーションを本番環境で稼働させるために、外部のPostgreSQLデータベースに接続し、その認証情報を安全に管理する仕組みを構築します。
+- **ステータス:** **完了**
+
+#### 📝 Level 3 計画ドキュメント (INF-01)
+
+##### 1. Overview (計画の概要)
+本番環境でアプリケーションを動作させるため、外部のPostgreSQLデータベースに接続し、その接続情報（パスワードなど）を安全に管理する仕組みを整えます。具体的には、アプリケーションが環境変数からデータベース接続情報やJWTシークレットキーを読み込むように設定を確定させ、必要な環境変数をドキュメント化します。
+
+##### 2. Files to Modify (影響範囲)
+- `backend/src/main/resources/application-prod.properties`
+- `docker-compose.prod.yml`
+- `env.example.txt`
+
+##### 3. Implementation Steps (実行手順)
+1.  **`application-prod.properties`の確認:** `spring.datasource.url=${DB_URL}`のように、設定値が環境変数プレースホルダーになっていることを確認します。
+2.  **`docker-compose.prod.yml`の確認:** バックエンドサービスに、`env_file`または`environment`セクションを使って環境変数を渡す設定になっていることを確認します。
+3.  **`env.example.txt`の整備:** 以下の必須環境変数が記載されていることを確認し、なければ追記します。
+    *   `DB_URL`
+    *   `DB_USERNAME`
+    *   `DB_PASSWORD`
+    *   `JWT_SECRET`
+
+##### 4. Testing Strategy (検証方法)
+ローカル環境で`.env`ファイルにダミーの本番用情報を記載し、`docker compose -f docker-compose.prod.yml up`を実行してバックエンドがエラーなく起動することを確認します。最終的な検証は、実際に本番環境へデプロイした際に行われます。
+
+**✅ すべて実施済み (2025-06-17)**

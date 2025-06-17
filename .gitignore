@@ -63,3 +63,6 @@ testghost/
 # Playwright artifacts
 playwright-report/
 test-results/
+
+# === interview notes ===
+/docs/interview_notes.md
