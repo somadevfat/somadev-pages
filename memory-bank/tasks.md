@@ -641,11 +641,11 @@ Playwright E2E テストが期待する `data-testid` と実際の管理画面 U
 - **ブランチ:** `feature/BE-09-rbac-implementation`
 - **説明:** ユーザーの役割に基づいてAPIへのアクセスを制御する仕組みを導入します。
 - **Output:**
-    - [ ] `Role`エンティティ（例: `ROLE_ADMIN`, `ROLE_USER`）を作成し、`User`エンティティと多対多の関連付けを行う。
-    - [ ] データ初期化時に管理者ユーザーを作成する仕組みを用意する（`CommandLineRunner`など）。
-    - [ ] `CustomUserDetailsService`がユーザーのロール情報を正しく`GrantedAuthority`として読み込むように修正する。
-    - [ ] コンテンツの作成・更新・削除など、管理者権限が必要なAPIエンドポイントに`@PreAuthorize("hasRole('ADMIN')")`アノテーションを追加してアクセスを制限する。
-    - [ ] 権限がない場合にHTTPステータスコード`403 Forbidden`が返ることを確認するテストを追加する。
+    - [x] `Role`エンティティ（例: `ROLE_ADMIN`, `ROLE_USER`）を作成し、`User`エンティティと多対多の関連付けを行う。
+    - [x] データ初期化時に管理者ユーザーを作成する仕組みを用意する（`CommandLineRunner`など）。
+    - [x] `CustomUserDetailsService`がユーザーのロール情報を正しく`GrantedAuthority`として読み込むように修正する。
+    - [x] コンテンツの作成・更新・削除など、管理者権限が必要なAPIエンドポイントに`@PreAuthorize("hasRole('ADMIN')")`アノテーションを追加してアクセスを制限する。
+    - [x] 権限がない場合にHTTPステータスコード`403 Forbidden`が返ることを確認するテストを追加する。
 
 #### 📝 Level 3 計画ドキュメント (BE-09)
 
@@ -678,23 +678,23 @@ Playwright E2E テストが期待する `data-testid` と実際の管理画面 U
 
 ##### 4. Implementation Strategy (実装戦略)
 1.  **ドメイン層の実装:**
-    -   [ ] `Role`エンティティと`RoleRepository`を作成する。
-    -   [ ] `User`エンティティに`Role`との関連（`@ManyToMany`）を追加する。
+    -   [x] `Role`エンティティと`RoleRepository`を作成する。
+    -   [x] `User`エンティティに`Role`との関連（`@ManyToMany`）を追加する。
 2.  **セキュリティ設定の更新:**
-    -   [ ] `SecurityConfig`で `@EnableGlobalMethodSecurity(prePostEnabled = true)` を有効化する。
-    -   [ ] `JwtTokenProvider`を修正し、JWT作成時にユーザーの役割をクレームに追加する。
-    -   [ ] `CustomUserDetailsService`を修正し、`UserDetails`オブジェクトに`GrantedAuthority`として役割情報を設定する。
+    -   [x] `SecurityConfig`で `@EnableGlobalMethodSecurity(prePostEnabled = true)` を有効化する。
+    -   [x] `JwtTokenProvider`を修正し、JWT作成時にユーザーの役割をクレームに追加する。
+    -   [x] `CustomUserDetailsService`を修正し、`UserDetails`オブジェクトに`GrantedAuthority`として役割情報を設定する。
 3.  **アクセス制御の適用:**
-    -   [ ] `ContentController`の`create`, `update`, `delete`のエンドポイントに `@PreAuthorize("hasRole('ADMIN')")` を追加する。
+    -   [x] `ContentController`の`create`, `update`, `delete`のエンドポイントに `@PreAuthorize("hasRole('ADMIN')")` を追加する。
 4.  **データ初期化:**
-    -   [ ] `DataInitializer`で`ADMIN`ロールを持つユーザーを初期データとして投入するように修正する。
+    -   [x] `DataInitializer`で`ADMIN`ロールを持つユーザーを初期データとして投入するように修正する。
 5.  **テスト:**
-    -   [ ] 管理者権限を持つユーザーと持たないユーザーで保護されたAPIを呼び出し、それぞれ `200 OK` と `403 Forbidden` が返ることを確認するテストケースを追加する。
+    -   [x] 管理者権限を持つユーザーと持たないユーザーで保護されたAPIを呼び出し、それぞれ `200 OK` と `403 Forbidden` が返ることを確認するテストケースを追加する。
 
 ##### 5. Creative Phase Components (クリエイティブフェーズが必要なコンポーネント)
 - このタスクは、確立されたセキュリティパターン（RBAC）の実装であり、新規のUI/UX設計や複雑なアルゴリズム設計を必要としないため、**クリエイティブフェーズは不要**です。
 
-- **ステータス:** **計画完了** (Ready for Implementation)
+- **ステータス:** **完了**
 
 ### 🎟️ チケット CI-01: 依存関係の脆弱性スキャン (Level 2)
 
@@ -765,3 +765,36 @@ Could not resolve placeholder 'app.jwt.secret' in value "${app.jwt.secret}"
 - Docker環境では環境変数による設定上書きが重要
 - GlobalExceptionHandlerがエラー詳細を隠すため、ログ確認が必要
 - 本番環境とテスト環境でのデータ初期化戦略の重要性
+
+## フェーズ7: リリース準備 (Release Preparation)
+
+### 🎟️ チケット INF-01: 本番用PostgreSQLとGitHub Secretsの整備 (Level 3)
+
+- **担当:** DevOps/Backend
+- **ブランチ:** `feature/release-preparation`
+- **説明:** アプリケーションを本番環境で稼働させるために、外部のPostgreSQLデータベースに接続し、その認証情報を安全に管理する仕組みを構築します。
+- **ステータス:** **完了**
+
+#### 📝 Level 3 計画ドキュメント (INF-01)
+
+##### 1. Overview (計画の概要)
+本番環境でアプリケーションを動作させるため、外部のPostgreSQLデータベースに接続し、その接続情報（パスワードなど）を安全に管理する仕組みを整えます。具体的には、アプリケーションが環境変数からデータベース接続情報やJWTシークレットキーを読み込むように設定を確定させ、必要な環境変数をドキュメント化します。
+
+##### 2. Files to Modify (影響範囲)
+- `backend/src/main/resources/application-prod.properties`
+- `docker-compose.prod.yml`
+- `env.example.txt`
+
+##### 3. Implementation Steps (実行手順)
+1.  **`application-prod.properties`の確認:** `spring.datasource.url=${DB_URL}`のように、設定値が環境変数プレースホルダーになっていることを確認します。
+2.  **`docker-compose.prod.yml`の確認:** バックエンドサービスに、`env_file`または`environment`セクションを使って環境変数を渡す設定になっていることを確認します。
+3.  **`env.example.txt`の整備:** 以下の必須環境変数が記載されていることを確認し、なければ追記します。
+    *   `DB_URL`
+    *   `DB_USERNAME`
+    *   `DB_PASSWORD`
+    *   `JWT_SECRET`
+
+##### 4. Testing Strategy (検証方法)
+ローカル環境で`.env`ファイルにダミーの本番用情報を記載し、`docker compose -f docker-compose.prod.yml up`を実行してバックエンドがエラーなく起動することを確認します。最終的な検証は、実際に本番環境へデプロイした際に行われます。
+
+**✅ すべて実施済み (2025-06-17)**
