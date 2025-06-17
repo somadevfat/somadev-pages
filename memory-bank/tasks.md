@@ -181,6 +181,52 @@
   - [x] ルートガードとログアウト機能を検証するE2Eテストを追加する。
 - **ステータス:** **完了**
 
+### 🎟️ チケット FE-10: レスポンシブ ハンバーガーメニュー実装
+- **担当:** Frontend
+- **ブランチ:** `feature/FE-10-responsive-hamburger-menu`
+- **説明:** 画面幅に応じてヘッダーのグローバルメニューをハンバーガーメニューに切り替える。スマホ画面では常にハンバーガー、PC 画面でも横幅が一定以下の場合はハンバーガーを表示する。
+- **Input:** `components/Header.tsx` に存在する現行ナビゲーション実装、Tailwind CSS のブレークポイント設定。
+- **Output:**
+  - 新しいハンバーガーアイコン (Lucide icon) を追加し、クリックでドロワーメニューがスライドイン / アウトする。
+  - スマホサイズ (`sm`) では常にハンバーガー表示、PC サイズでも `md` 未満に縮小した場合はハンバーガー表示へ切替。
+  - ドロワーメニューはキーボード操作 (Esc で閉じる) に対応し、アクセシビリティ属性 (`aria-*`) を付与する。
+  - Playwright でメニュー開閉が正しく動作する E2E テストケースを追加する。
+- **ステータス:** 未着手
+
+#### 📝 Level 2 Plan (FE-10: レスポンシブ ハンバーガーメニュー実装)
+
+1. 📋 **Overview**
+   - 既存ヘッダー (`components/Header.tsx`) をレスポンシブ対応させ、画面幅に応じてハンバーガーメニューへ切り替える。
+   - スマホサイズ (`<640px`) では常時ハンバーガーメニュー、PC 画面でもウィンドウ幅が `md` 未満に縮小するとハンバーガーメニューを表示する。
+
+2. 📁 **Files to Modify / Create**
+   - `components/Header.tsx` (メイン変更)
+   - `app/globals.css` (必要に応じて汎用クラス追加)
+   - `tests/e2e/header-menu.spec.ts` (Playwright E2E)
+
+3. 🔄 **Implementation Steps**
+   1. Lucide の `Menu` と `X` アイコンをインポート。
+   2. `useState` で `isOpen` を管理し、ハンバーガークリックでトグル。
+   3. TailwindCSS `md:hidden` / `md:flex` クラスを用いて、
+      - PC 向けメニュー: `hidden md:flex`
+      - ハンバーガーアイコン: `md:hidden`
+   4. モバイルメニューを `fixed` / `absolute` で画面右からスライドインさせる (transition)。
+   5. `Esc` キー押下・リンククリックで `isOpen = false` に。
+   6. `aria-expanded` などアクセシビリティ属性を追加。
+
+4. ⚠️ **Potential Challenges**
+   - フォーカストラップ & キーボード操作のアクセシビリティ担保。
+   - SSR 時に `window` 参照を避ける（不要と思われるが注意）。
+   - Tailwind の `transition` と `overflow-hidden` 競合で body スクロールが残る可能性。
+
+5. ✅ **Testing Strategy**
+   - **Unit/Component**: `jest` + `@testing-library/react` (任意) でクリック時の DOM 表示を確認。
+   - **E2E (必須)**: Playwright で以下を検証。
+     1. 画面幅 375px でロード → ハンバーガー表示。
+     2. ハンバーガークリック → メニューがスライドインし、リンクが表示される。
+     3. リンククリック後にメニューが閉じる。
+     4. 画面幅 1440px → PC メニューが表示され、ハンバーガーが非表示。
+
 ---
 
 ## フェーズ 4: 統合と最終化 (Integration Phase)
