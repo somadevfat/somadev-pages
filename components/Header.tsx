@@ -19,7 +19,7 @@ const Header = () => {
     <header className="w-full border-b border-gray-200">
       <div className="max-w-4xl w-full mx-auto px-4 py-4 flex justify-between items-center">
         <Link href="/" className="text-header-title font-semibold text-textDark hover:text-chicBlue whitespace-nowrap">
-          fanda-dev.com
+          Soma on bush
         </Link>
         
         {/* Desktop Navigation */}
