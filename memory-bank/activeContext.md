@@ -1,3 +1,6 @@
 # Active Context
 
-_No active task. Ready for next assignment._ 
+**Task ID:** FE-10  
+**概要:** レスポンシブ ハンバーガーメニュー実装（グローバルヘッダー）  
+**フェーズ:** VAN  
+**次モード:** PLAN 
