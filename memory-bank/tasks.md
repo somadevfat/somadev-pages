@@ -894,3 +894,58 @@ Could not resolve placeholder 'app.jwt.secret' in value "${app.jwt.secret}"
 5. ✅ **Testing Strategy**
    - **Manual:** ブラウザのレスポンシブモードでデザイン確認。
    - **E2E:** Playwright で画像の存在・表示確認 (ビューポート375×667と1280×800)。
+
+### 🎟️ チケット FE-13: フッターリンクとコピーライト更新
+
+- **担当:** Frontend
+- **ブランチ:** `feature/FE-13-footer-update`
+- **説明:** サイト全体のフッターを以下のように変更する。
+  1. ナビゲーションリンクを「Contact」と「Blog」の2つのみにする。
+  2. コピーライト表記を `fanda-dev.com` に変更する。
+- **Input:** `components/Footer.tsx`
+- **Output:**
+  - `components/Footer.tsx` の `<nav>` 内のリンクリストが「Contact」「Blog」だけになる。
+  - `<footer>` のコピーライト行が `© {currentYear} fanda-dev.com` になる。
+  - 関連E2Eテスト（必要であれば）を追加または更新し、Playwright `footer.spec.ts` などで変更が検証される。
+- **ステータス:** 未着手
+
+#### 📝 Level 2 計画ドキュメント (FE-13: フッターリンク/コピーライト更新)
+
+1. 📋 **Overview**
+   - フッターのナビゲーションリンクをシンプルにし、ブランド名として `fanda-dev.com` を明示する。
+
+2. 📁 **Files to Modify / Create**
+   - `components/Footer.tsx`
+   - `tests/e2e/footer.spec.ts` (新規: 任意)
+
+3. 🔄 **Implementation Steps**
+   1. 新ブランチ `feature/FE-13-footer-update` を `develop` から作成。
+   2. `components/Footer.tsx` 内の `<ul>` を修正し、`Contact` と `Blog` のみ残す。
+   3. `<p>` のコピーライト行を `&copy; {currentYear} fanda-dev.com` に置き換える。
+   4. ローカルで `npm run lint` と `npm run test` を実行しエラーがないことを確認。
+   5. 変更が正しく反映されているかブラウザで確認。
+   6. Playwright テスト (必要に応じて) を追加・更新し、CI が通ることを確認。
+   7. `git push` 後、GitHub CLI で PR を作成し、ベース `develop` へマージを依頼。
+
+4. 🔗 **Subtasks**
+   - [ ] ブランチ作成 (`feature/FE-13-footer-update`)
+   - [x] ナビゲーションリンクをContactとBlogに変更
+   - [x] コピーライト表記をfanda-dev.comに変更
+   - [x] Playwrightテスト追加/更新
+   - [ ] `npm run lint` と `npm run test` パス
+   - [ ] PR作成・レビュー・マージ
+
+5. ⏳ **Time Estimates**
+   - 実装: 0.5h
+   - テスト作成: 0.5h
+   - 動作確認 & lint/test: 0.25h
+   - PRレビュー & 修正: 0.25h
+   - **合計: 約1.5h**
+
+6. ⚠️ **Potential Challenges**
+   - ナビゲーションリンクを削除したことにより、他コンポーネントやページで参照されていないか確認。
+   - i18n（今後導入予定）があれば、テキスト変更時の翻訳ファイル影響に注意。
+
+7. ✅ **Testing Strategy**
+   - **Manual:** ローカルでフッターが期待通りに表示されるかをChrome DevToolsで確認。
+   - **E2E:** Playwright テストでリンクが2つのみであり、クリック時にそれぞれ `/contact` `/blog` に遷移することを確認。
