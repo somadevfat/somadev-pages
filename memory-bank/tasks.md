@@ -181,6 +181,52 @@
   - [x] ルートガードとログアウト機能を検証するE2Eテストを追加する。
 - **ステータス:** **完了**
 
+### 🎟️ チケット FE-10: レスポンシブ ハンバーガーメニュー実装
+- **担当:** Frontend
+- **ブランチ:** `feature/FE-10-responsive-hamburger-menu`
+- **説明:** 画面幅に応じてヘッダーのグローバルメニューをハンバーガーメニューに切り替える。スマホ画面では常にハンバーガー、PC 画面でも横幅が一定以下の場合はハンバーガーを表示する。
+- **Input:** `components/Header.tsx` に存在する現行ナビゲーション実装、Tailwind CSS のブレークポイント設定。
+- **Output:**
+  - 新しいハンバーガーアイコン (Lucide icon) を追加し、クリックでドロワーメニューがスライドイン / アウトする。
+  - スマホサイズ (`sm`) では常にハンバーガー表示、PC サイズでも `md` 未満に縮小した場合はハンバーガー表示へ切替。
+  - ドロワーメニューはキーボード操作 (Esc で閉じる) に対応し、アクセシビリティ属性 (`aria-*`) を付与する。
+  - Playwright でメニュー開閉が正しく動作する E2E テストケースを追加する。
+- **ステータス:** 未着手
+
+#### 📝 Level 2 Plan (FE-10: レスポンシブ ハンバーガーメニュー実装)
+
+1. 📋 **Overview**
+   - 既存ヘッダー (`components/Header.tsx`) をレスポンシブ対応させ、画面幅に応じてハンバーガーメニューへ切り替える。
+   - スマホサイズ (`<640px`) では常時ハンバーガーメニュー、PC 画面でもウィンドウ幅が `md` 未満に縮小するとハンバーガーメニューを表示する。
+
+2. 📁 **Files to Modify / Create**
+   - `components/Header.tsx` (メイン変更)
+   - `app/globals.css` (必要に応じて汎用クラス追加)
+   - `tests/e2e/header-menu.spec.ts` (Playwright E2E)
+
+3. 🔄 **Implementation Steps**
+   1. Lucide の `Menu` と `X` アイコンをインポート。
+   2. `useState` で `isOpen` を管理し、ハンバーガークリックでトグル。
+   3. TailwindCSS `md:hidden` / `md:flex` クラスを用いて、
+      - PC 向けメニュー: `hidden md:flex`
+      - ハンバーガーアイコン: `md:hidden`
+   4. モバイルメニューを `fixed` / `absolute` で画面右からスライドインさせる (transition)。
+   5. `Esc` キー押下・リンククリックで `isOpen = false` に。
+   6. `aria-expanded` などアクセシビリティ属性を追加。
+
+4. ⚠️ **Potential Challenges**
+   - フォーカストラップ & キーボード操作のアクセシビリティ担保。
+   - SSR 時に `window` 参照を避ける（不要と思われるが注意）。
+   - Tailwind の `transition` と `overflow-hidden` 競合で body スクロールが残る可能性。
+
+5. ✅ **Testing Strategy**
+   - **Unit/Component**: `jest` + `@testing-library/react` (任意) でクリック時の DOM 表示を確認。
+   - **E2E (必須)**: Playwright で以下を検証。
+     1. 画面幅 375px でロード → ハンバーガー表示。
+     2. ハンバーガークリック → メニューがスライドインし、リンクが表示される。
+     3. リンククリック後にメニューが閉じる。
+     4. 画面幅 1440px → PC メニューが表示され、ハンバーガーが非表示。
+
 ---
 
 ## フェーズ 4: 統合と最終化 (Integration Phase)
@@ -798,3 +844,53 @@ Could not resolve placeholder 'app.jwt.secret' in value "${app.jwt.secret}"
 ローカル環境で`.env`ファイルにダミーの本番用情報を記載し、`docker compose -f docker-compose.prod.yml up`を実行してバックエンドがエラーなく起動することを確認します。最終的な検証は、実際に本番環境へデプロイした際に行われます。
 
 **✅ すべて実施済み (2025-06-17)**
+
+### 🎟️ チケット FE-11: ヒーローセクション画像差し替え
+
+- **担当:** Frontend
+- **ブランチ:** `feature/FE-11-hero-image-replacement`
+- **説明:** トップページのヒーローセクションで使用するプロフィール画像を `topgyazo.jpg` に差し替え、縦長画像でも全体が表示されるようレイアウトを調整する。
+- **Input:** 既存 `app/page.tsx` のヒーローセクション実装、`public/topgyazo.jpg` 画像ファイル。
+- **Output:**
+  - `public/topgyazo.jpg` がGit管理下に追加される。
+  - `app/page.tsx` の `Image` コンポーネントが `src="/topgyazo.jpg"` を使用し、縦長画像を全体表示できるようコンテナが修正される。
+  - レイアウトはスマホ・PC 双方で崩れず、画像が上下左右切れずに収まる (`object-contain`)。
+  - Playwright E2E テストでヒーロー画像の表示が確認できる。
+- **ステータス:** 未着手
+
+#### 📝 Level 2 計画ドキュメント (FE-11: ヒーロー画像差し替え)
+
+1. 📋 **Overview**
+   - トップページヒーローのプロフィール画像を差し替え、縦長比率に合わせてコンテナを `aspect-ratio` で指定し、`object-contain` で画像全体を表示。
+
+2. 📁 **Files to Modify / Create**
+   - `public/topgyazo.jpg` (追加)
+   - `app/page.tsx` (ヒーロー画像部分のレイアウト修正)
+   - `tests/e2e/hero-image.spec.ts` (Playwright E2E – 画像表示確認)
+
+3. 🔄 **Implementation Steps**
+   1. 画像ファイル `topgyazo.jpg` を `public/` に追加し Git へコミット。
+   2. `app/page.tsx` 内ヒーロー画像のコンテナを以下に変更:
+      ```tsx
+      <div className="relative w-48 md:w-60 lg:w-72 aspect-[3/4] overflow-hidden shrink-0">
+        <Image
+          src="/topgyazo.jpg"
+          alt="Soma walking on a sunny path"
+          fill
+          style={{ objectFit: 'contain' }}
+          sizes="(max-width: 768px) 192px, 288px"
+          priority
+        />
+      </div>
+      ```
+   3. 既存 `Image` コンポーネントの `objectFit` を `contain` にし、上下左右に空きが出る場合はコンテナ背景を `bg-gray-100` にして自然に見せる。
+   4. `npm run dev` で確認し、幅375px/768px/1440px でレイアウト崩れが無いか確認。
+   5. Playwright テスト (`hero-image.spec.ts`) で画像の `src` 属性が `/topgyazo.jpg` であることと画像がロードされていることを検証。
+
+4. ⚠️ **Potential Challenges**
+   - `object-contain` のため左右余白が発生する。背景色や max-w 調整で違和感を抑える。
+   - 画像のファイルサイズが大きい場合は `next/image` の最適化により生成画像サイズを確認する。
+
+5. ✅ **Testing Strategy**
+   - **Manual:** ブラウザのレスポンシブモードでデザイン確認。
+   - **E2E:** Playwright で画像の存在・表示確認 (ビューポート375×667と1280×800)。

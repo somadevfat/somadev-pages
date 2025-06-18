@@ -54,13 +54,13 @@ export default function HomePage() {
               </div>
             </div>
             {/* Profile Image */}
-            <div className="w-80 h-40 md:md:w-96 md:h-96 relative shrink-0 overflow-hidden">
+            <div className="relative w-48 md:w-60 lg:w-72 aspect-[3/4] overflow-hidden shrink-0 bg-gray-100 rounded-lg">
               <Image
-                src="/profile.jpg"
-                alt="Soma - Profile Picture"
+                src="/topgyazo.jpg"
+                alt="Soma walking on a sunny path"
                 fill
-                style={{ objectFit: 'cover' }}
-                sizes="(max-width: 768px) 320px, 384px"
+                style={{ objectFit: 'contain' }}
+                sizes="(max-width: 768px) 192px, (max-width: 1024px) 240px, 288px"
                 priority
               />
             </div>
