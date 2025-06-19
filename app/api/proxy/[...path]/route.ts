@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// API ベース URL を解決
-// 優先順位: 1) サーバサイド専用 (container / Vercel) 2) フロントエンド公開変数 3) dev 環境デフォルト
-const API_BASE =
-  process.env.API_BASE_URL_INTERNAL ||
-  process.env.NEXT_PUBLIC_API_BASE_URL ||
-  'http://backend:8080/api';
+const API_BASE = process.env.API_BASE_URL_INTERNAL || 'http://backend:8080/api';
 
 function buildHeaders(req: NextRequest): Record<string, string> {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
@@ -26,18 +21,18 @@ async function forwardResponse(backendRes: Response): Promise<NextResponse> {
     headers.set('Content-Type', contentType);
   }
 
-  // Handle Set-Cookie headers properly for multiple values
-  // Use getSetCookie() if available (Next.js 15+ / Edge Runtime)
-  if (typeof backendRes.headers.getSetCookie === 'function') {
-    const cookies = backendRes.headers.getSetCookie();
-    for (const cookie of cookies) {
-      headers.append('set-cookie', cookie);
-    }
-  } else {
-    // Fallback for single Set-Cookie header
-    const setCookieHeader = backendRes.headers.get('set-cookie');
-    if (setCookieHeader) {
-      headers.set('set-cookie', setCookieHeader);
+  // Specifically handle and forward all Set-Cookie headers as an array
+  const setCookieHeaders = (backendRes.headers as any).getSetCookie
+    ? (backendRes.headers as any).getSetCookie()
+    : backendRes.headers.get('set-cookie');
+
+  if (setCookieHeaders) {
+    if (Array.isArray(setCookieHeaders)) {
+      setCookieHeaders.forEach((cookie) => {
+        headers.append('set-cookie', cookie);
+      });
+    } else if (typeof setCookieHeaders === 'string') {
+      headers.set('set-cookie', setCookieHeaders);
     }
   }
 
