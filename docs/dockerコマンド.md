@@ -126,3 +126,67 @@ docker system prune
 # 【注意：データが消えます】未使用のボリュームを全て削除
 docker volume prune
 ```
+
+# Docker コマンド集
+
+## 基本コマンド
+
+### 起動・停止
+```bash
+# 起動
+docker-compose up -d
+
+# 停止
+docker-compose down
+
+# 完全削除（ボリューム含む）
+docker-compose down -v
+```
+
+### ビルド・再起動
+```bash
+# リビルドして起動
+docker-compose up -d --build
+
+# 特定サービスのみリビルド
+docker-compose up -d --build backend
+```
+
+## メモリ最適化設定
+
+### 設定内容
+- **Java ヒープサイズ**: 最大400MB、初期200MB
+- **PostgreSQL**: shared_buffers=128MB、max_connections=50
+- **ガベージコレクタ**: G1GC使用で低レイテンシ
+
+### 対象環境
+- メモリ1GB以下のサーバー
+- VPSやクラウドの小規模インスタンス
+
+### 設定確認
+```bash
+# コンテナのメモリ使用量確認
+docker stats
+
+# Java プロセスの確認
+docker-compose exec backend ps aux
+```
+
+## トラブルシューティング
+
+### メモリ不足の症状
+- Spring Boot起動が完了しない
+- API接続でConnection reset by peer
+- CPU使用率が異常に高い
+
+### 対処法
+```bash
+# システムメモリ確認
+free -h
+
+# Swap確認
+swapon --show
+
+# ログ確認
+docker-compose logs backend | tail -50
+```

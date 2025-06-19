@@ -3,16 +3,21 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import Cookies from 'js-cookie';
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const router = useRouter();
 
-  const handleLogout = () => {
-    Cookies.remove('token', { path: '/' });
-    router.replace('/login');
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch (error) {
+      console.error('Failed to logout:', error);
+      // Optionally, show an error message to the user
+    } finally {
+      router.replace('/login');
+    }
   };
 
   const Sidebar = (

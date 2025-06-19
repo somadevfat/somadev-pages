@@ -11,12 +11,33 @@ function buildHeaders(req: NextRequest): Record<string, string> {
   return headers;
 }
 
+async function forwardResponse(backendRes: Response): Promise<NextResponse> {
+  const data = await backendRes.text();
+  const headers = new Headers();
+
+  // Copy essential headers from the backend response
+  const contentType = backendRes.headers.get('Content-Type');
+  if (contentType) {
+    headers.set('Content-Type', contentType);
+  }
+
+  // Specifically handle and forward the Set-Cookie header
+  const setCookieHeader = backendRes.headers.get('set-cookie');
+  if (setCookieHeader) {
+    headers.set('set-cookie', setCookieHeader);
+  }
+
+  return new NextResponse(data, {
+    status: backendRes.status,
+    headers: headers,
+  });
+}
+
 export async function GET(req: NextRequest, { params }: { params: { path: string[] } }) {
   const targetPath = params.path.join('/');
   const url = `${API_BASE}/${targetPath}${req.nextUrl.search}`;
   const backendRes = await fetch(url, { headers: buildHeaders(req) });
-  const data = await backendRes.text();
-  return new NextResponse(data, { status: backendRes.status, headers: { 'Content-Type': backendRes.headers.get('Content-Type') || 'application/json' } });
+  return forwardResponse(backendRes);
 }
 
 export async function POST(req: NextRequest, { params }: { params: { path: string[] } }) {
@@ -24,8 +45,7 @@ export async function POST(req: NextRequest, { params }: { params: { path: strin
   const url = `${API_BASE}/${targetPath}`;
   const body = await req.text();
   const backendRes = await fetch(url, { method: 'POST', body, headers: buildHeaders(req) } as RequestInit);
-  const data = await backendRes.text();
-  return new NextResponse(data, { status: backendRes.status, headers: { 'Content-Type': backendRes.headers.get('Content-Type') || 'application/json' } });
+  return forwardResponse(backendRes);
 }
 
 export async function PUT(req: NextRequest, { params }: { params: { path: string[] } }) {
@@ -33,14 +53,12 @@ export async function PUT(req: NextRequest, { params }: { params: { path: string
   const url = `${API_BASE}/${targetPath}`;
   const body = await req.text();
   const backendRes = await fetch(url, { method: 'PUT', body, headers: buildHeaders(req) } as RequestInit);
-  const data = await backendRes.text();
-  return new NextResponse(data, { status: backendRes.status, headers: { 'Content-Type': backendRes.headers.get('Content-Type') || 'application/json' } });
+  return forwardResponse(backendRes);
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: { path: string[] } }) {
   const targetPath = params.path.join('/')
   const url = `${API_BASE}/${targetPath}`;
   const backendRes = await fetch(url, { method: 'DELETE', headers: buildHeaders(req) } as RequestInit);
-  const data = await backendRes.text();
-  return new NextResponse(data, { status: backendRes.status, headers: { 'Content-Type': backendRes.headers.get('Content-Type') || 'application/json' } });
+  return forwardResponse(backendRes);
 } 

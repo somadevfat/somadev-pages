@@ -36,9 +36,14 @@ test.describe('Authentication and Authorization', () => {
     // 3. Logout
     await page.click('[data-testid="logout-button"]');
 
-    // 4. Verify redirection to login page after logout
+    // 4. Verify redirection to login page and that the cookie is cleared
     await page.waitForURL('**/login', { timeout: 15000 });
     await expect(page.locator('h1')).toContainText('Login');
+    
+    // Check that the 'token' cookie is gone
+    const cookies = await page.context().cookies();
+    const tokenCookie = cookies.find(c => c.name === 'token');
+    expect(tokenCookie).toBeUndefined();
 
     // 5. Verify that admin area is protected again
     await page.goto('/admin/articles');
