@@ -21,10 +21,20 @@ async function forwardResponse(backendRes: Response): Promise<NextResponse> {
     headers.set('Content-Type', contentType);
   }
 
-  // Specifically handle and forward the Set-Cookie header
-  const setCookieHeader = backendRes.headers.get('set-cookie');
-  if (setCookieHeader) {
-    headers.set('set-cookie', setCookieHeader);
+  // Specifically handle and forward all Set-Cookie headers as an array
+  const responseHeaders = backendRes.headers as Headers & { getSetCookie?: () => string[] };
+  const setCookieHeaders = responseHeaders.getSetCookie
+    ? responseHeaders.getSetCookie()
+    : responseHeaders.get('set-cookie');
+
+  if (setCookieHeaders) {
+    if (Array.isArray(setCookieHeaders)) {
+      setCookieHeaders.forEach((cookie) => {
+        headers.append('set-cookie', cookie);
+      });
+    } else if (typeof setCookieHeaders === 'string') {
+      headers.set('set-cookie', setCookieHeaders);
+    }
   }
 
   return new NextResponse(data, {
