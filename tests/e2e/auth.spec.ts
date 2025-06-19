@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
-const adminEmail = process.env.E2E_TEST_USER_EMAIL;
-const adminPassword = process.env.E2E_TEST_USER_PASSWORD;
+const adminEmail = process.env.E2E_TEST_USER_EMAIL || 'admin@example.com';
+const adminPassword = process.env.E2E_TEST_USER_PASSWORD || 'password';
 
 test.describe('Authentication and Authorization', () => {
 
@@ -71,5 +71,55 @@ test.describe('Authentication and Authorization', () => {
     // 3. Expect to be redirected back to the admin area
     await page.waitForURL('**/admin/articles', { timeout: 15000 });
     expect(page.url()).toContain('/admin/articles');
+  });
+
+  test('should login successfully and store JWT cookie', async ({ page }) => {
+    // Go to login page
+    await page.goto('/login');
+    
+    // Fill login form
+    await page.fill('[data-testid="email-input"]', adminEmail);
+    await page.fill('[data-testid="password-input"]', adminPassword);
+    
+    // Submit login
+    await page.click('[data-testid="login-button"]');
+    
+    // Should redirect to admin dashboard
+    await expect(page).toHaveURL(/.*\/admin\/articles/);
+    
+    // Verify logout button is visible (indicating successful login)
+    await expect(page.locator('[data-testid="logout-button"]')).toBeVisible();
+    
+    // Verify JWT token cookie is stored
+    const cookies = await page.context().cookies();
+    const tokenCookie = cookies.find(cookie => cookie.name === 'token');
+    expect(tokenCookie).toBeDefined();
+    expect(tokenCookie?.value).toBeTruthy();
+    expect(tokenCookie?.httpOnly).toBe(true);
+  });
+
+  test('should logout successfully and clear JWT cookie', async ({ page }) => {
+    // First login
+    await page.goto('/login');
+    await page.fill('[data-testid="email-input"]', adminEmail);
+    await page.fill('[data-testid="password-input"]', adminPassword);
+    await page.click('[data-testid="login-button"]');
+    
+    // Verify login successful
+    await expect(page.locator('[data-testid="logout-button"]')).toBeVisible();
+    
+    // Logout
+    await page.click('[data-testid="logout-button"]');
+    
+    // Should redirect to login page
+    await expect(page).toHaveURL(/.*\/login/);
+    
+    // Verify token cookie is removed or expired
+    const cookies = await page.context().cookies();
+    const tokenCookie = cookies.find(cookie => cookie.name === 'token');
+    // Cookie should either not exist or be expired (value empty/maxAge 0)
+    if (tokenCookie) {
+      expect(tokenCookie.value).toBeFalsy();
+    }
   });
 }); 
