@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const API_BASE = process.env.API_BASE_URL_INTERNAL || 'http://backend:8080/api';
+// API ベース URL を解決
+// 優先順位: 1) サーバサイド専用 (container / Vercel) 2) フロントエンド公開変数 3) dev 環境デフォルト
+const API_BASE =
+  process.env.API_BASE_URL_INTERNAL ||
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  'http://backend:8080/api';
 
 function buildHeaders(req: NextRequest): Record<string, string> {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
