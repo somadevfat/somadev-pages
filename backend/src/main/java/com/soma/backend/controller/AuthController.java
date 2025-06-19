@@ -45,7 +45,7 @@ public class AuthController {
                     .path("/")
                     .maxAge(24 * 60 * 60) // 1 day
                     .secure("prod".equals(activeProfile)) // Set Secure flag only in production
-                    .sameSite("prod".equals(activeProfile) ? "None" : "Lax")
+                    .sameSite("Strict")
                     .build();
 
             return ResponseEntity.ok()
