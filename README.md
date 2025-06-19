@@ -1,121 +1,170 @@
-# Soma Pages – ポートフォリオ兼ヘッドレス CMS サンプル
+# Soma Pages – フルスタックWebアプリケーション
 
-![architecture-diagram](docs/architecture.png)
+> **Next.js × Spring Boot × PostgreSQL** で構築した本格的なポートフォリオ兼CMS
 
-## 0. このリポジトリについて
+## 🎯 アプリケーション画面
 
-本リポジトリは **Next.js × Spring Boot × PostgreSQL** を用いて構築したフルスタック Web アプリケーションのサンプルです。就職活動のポートフォリオとして、以下のポイントを示すことを目的としています。
+<div align="center">
 
-* **モダンなフロントエンド開発**（Next.js 15 App Router / React 18 / Tailwind CSS）
-* **堅牢なバックエンド設計**（Spring Boot 3 / JWT 認証 / RBAC）
-* **Docker による環境統一 & クラウドデプロイ**
-* **CI / テスト自動化**（GitHub Actions / JUnit / Playwright）
+### ブログ一覧画面
+<img src="README用写真/blog一覧.png" alt="ブログ一覧" width="600" />
 
-> 🌱 **個人開発でも「チーム開発で通用する設計・運用」を意識**していることをアピールできます。
+### 管理画面 - ログイン
+<img src="README用写真/ログインフォーム.png" alt="ログインフォーム" width="400" />
 
----
+### 管理画面 - 記事編集
+<img src="README用写真/記入UIｋ.png" alt="記事編集フォーム" width="600" />
 
-## 1. 主要機能
-
-| 分類 | 機能 | 技術 | 実装状況 |
-|------|------|------|----------|
-| 認証 | メール & パスワードでログイン | Spring Security / JWT | ✅ 完了 |
-| 認可 | `ADMIN` / `USER` 役割による RBAC | `@PreAuthorize` | ✅ 完了 |
-| コンテンツ管理 | 記事 CRUD API | Spring Data JPA | ✅ 完了 |
-| 管理 UI | 記事一覧 / 作成 / 編集フォーム | Next.js + Tailwind | ✅ 完了 |
-| テスト | 統合テスト (JUnit) / E2E (Playwright) | Testcontainers 他 | ✅ 完了 |
-| CI | フロント / バック / E2E 並列実行 | GitHub Actions | ✅ 完了 |
-| セキュリティ強化 | HttpOnly Cookie 認証 | Spring Security | ⏳ 予定 (BE-07) |
-| CD | Docker イメージ GHCR Push | GitHub Actions | ⏳ 予定 (CD-01) |
-| 運用 | HTTPS リバースプロキシ (Nginx) | Traefik or Nginx | ⏳ 予定 (OPS-01) |
+</div>
 
 ---
 
-## 2. 技術スタック
+## 🚀 プロジェクト概要
 
-### フロントエンド
-* Next.js 15 (App Router)
-* React 18 / TypeScript 5.7
-* Tailwind CSS 3.4
-* Playwright + Vitest
+本プロジェクトは **就職活動のポートフォリオ** として、モダンな技術スタックを用いて開発したフルスタックWebアプリケーションです。
 
-### バックエンド
-* Spring Boot 3.3
-* Spring Security + JWT
-* PostgreSQL 15
-* Flyway による DB マイグレーション
-* Testcontainers / JUnit5
-
-### インフラ & DevOps
-* Docker / Docker Compose
-* GitHub Actions (Lint → Build → Test → E2E → Docker Build)
-* Google Cloud VM (Ubuntu 24.04) へデプロイ（手動 Pull）
+### 💡 開発コンセプト
+* **個人開発でもチーム開発で通用する設計・運用を実践**
+* **モダンなフロントエンド技術の習得と実装**
+* **セキュアで保守性の高いバックエンド設計**
+* **CI/CD・テスト自動化による品質保証**
 
 ---
 
-## 3. クイックスタート
+## ⚡️ 主要機能・実装状況
 
-### 3-1. ローカル環境
+| カテゴリ | 機能 | 技術・手法 | ステータス |
+|---------|------|------------|------------|
+| **認証** | JWT認証・ログイン | Spring Security + JWT | ✅ **完了** |
+| **認可** | ロールベースアクセス制御 | `@PreAuthorize` / RBAC | ✅ **完了** |
+| **CMS** | 記事CRUD API | Spring Data JPA | ✅ **完了** |
+| **管理UI** | 記事一覧・作成・編集 | Next.js + Tailwind CSS | ✅ **完了** |
+| **管理UI** | フィルタリング・検索機能 | React State Management | 🚧 **実装予定** |
+| **テスト** | 統合テスト・E2Eテスト | JUnit + Playwright | ✅ **完了** |
+| **CI** | 自動テスト・ビルド | GitHub Actions | ✅ **完了** |
+| **セキュリティ** | HttpOnly Cookie認証 | Spring Security | 📋 **予定 (BE-07)** |
+| **DevOps** | Docker自動デプロイ | GHCR + Docker Compose | 📋 **予定 (CD-01)** |
+
+---
+
+## 🛠 技術スタック
+
+### **フロントエンド**
+```
+Next.js 15 (App Router) + React 18 + TypeScript 5.7
+Tailwind CSS 3.4 + Playwright E2E + Vitest
+```
+
+### **バックエンド**  
+```
+Spring Boot 3.3 + Spring Security + JWT
+PostgreSQL 15 + Flyway Migration
+JUnit5 + Testcontainers
+```
+
+### **インフラ & DevOps**
+```
+Docker + Docker Compose
+GitHub Actions (Lint → Test → E2E → Build)
+Google Cloud VM (Ubuntu 24.04)
+```
+
+---
+
+## 🏗 システム構成
+
+```
+┌─────────────┐    ┌──────────────┐    ┌─────────────┐
+│   Next.js   │───▶│ Spring Boot  │───▶│ PostgreSQL  │
+│  (Port:3000)│    │  (Port:8080) │    │ (Port:5432) │
+└─────────────┘    └──────────────┘    └─────────────┘
+       │                    │
+       └── /api/proxy/* ─────┘ (内部通信)
+```
+
+**今後の拡張予定**: Nginx/Traefik終端でHTTPS化 + リバースプロキシ
+
+---
+
+## 🚦 クイックスタート
+
+### ローカル開発環境
 ```bash
-# リポジトリ取得
-$ git clone https://github.com/yourname/soma-pages.git && cd soma-pages
+# 1. リポジトリクローン
+git clone https://github.com/yourname/soma-pages.git
+cd soma-pages
 
-# 依存関係インストール
-$ npm i  # フロント
-$ ./mvnw clean package -DskipTests  # バック
+# 2. 依存関係インストール
+npm install                              # フロントエンド
+./mvnw clean package -DskipTests        # バックエンド
 
-# 環境変数を用意
-$ cp env.example.txt .env  # プレースホルダーを書き換えてください
+# 3. 環境変数設定
+cp env.example.txt .env
+# .envファイルを編集してください
 
-# コンテナ一発起動 (フロント + バック + DB)
-$ docker compose up -d
+# 4. アプリケーション起動
+docker compose up -d
 ```
 
-* フロントエンド: <http://localhost:3000>
-* バックエンド API: <http://localhost:8080/api>
-
-### 3-2. 本番 (VM / サーバー)
-```bash
-# VM で初回のみ
-$ git pull origin develop
-$ docker compose -f docker-compose.prod.yml pull  # GHCR Push 済みの場合
-$ docker compose -f docker-compose.prod.yml up -d
-```
-必要な環境変数は **Secret Manager / GitHub Secrets** などで注入してください。
+### アクセス先
+- **フロントエンド**: http://localhost:3000
+- **バックエンド API**: http://localhost:8080/api
+- **管理画面**: http://localhost:3000/admin
 
 ---
 
-## 4. システム構成図
-```
-[Next.js]  ──>  /api/proxy/*  ─┐
-                             │ (内部通信)
-[Spring Boot] ──> PostgreSQL ─┘
-```
-* Nginx / Traefik 終端 (OPS-01 完了後) で HTTPS → 80/8080 へリバースプロキシ予定
+## 🧪 テスト・品質保証
 
----
-
-## 5. テスト & CI
-
+### CI/CDパイプライン
 ```mermaid
 graph LR
-A[Push / PR] --> B[GitHub Actions]
-B --> C[Lint & Unit Test]
-B --> D[Spring Boot Integration Test]
-B --> E[Playwright E2E]
-C & D & E --> F[Docker Build]
+    A[Git Push] --> B[GitHub Actions]
+    B --> C[ESLint + TypeScript]
+    B --> D[Spring Boot Tests]
+    B --> E[Playwright E2E]
+    C --> F[Docker Build]
+    D --> F
+    E --> F
+    F --> G[デプロイ準備完了]
 ```
-すべてグリーンになれば main/develop へマージ可能というゲートを設定。
+
+### テストカバレッジ
+- **フロントエンド**: Vitest + React Testing Library
+- **バックエンド**: JUnit5 + Testcontainers + MockMvc
+- **E2E**: Playwright (ブラウザ自動化テスト)
 
 ---
 
-## 6. 今後のロードマップ (tasks.md 抜粋)
-* **BE-07:** JWT を HttpOnly Cookie で配信し、XSS 耐性を強化
-* **CD-01:** Docker イメージを GHCR へ自動 Push、サーバー側は `docker compose pull` → `up -d` でローリング更新
-* **OPS-01:** Nginx / Traefik + Let's Encrypt で HTTPS 自動更新
-* **CI-01:** OWASP Dependency-Check による脆弱性スキャンジョブ
+## 📈 今後のロードマップ
+
+### **近日実装予定**
+- **BE-07**: JWT → HttpOnly Cookie移行 (XSS対策強化)
+- **FE-08**: 管理画面フィルタリング・検索機能
+- **CD-01**: GitHub Container Registry自動デプロイ
+
+### **中長期計画**
+- **OPS-01**: Nginx + Let's Encrypt HTTPS自動更新
+- **CI-02**: OWASP依存関係脆弱性スキャン
+- **PERF-01**: Redis導入でパフォーマンス最適化
 
 ---
 
-## 7. ライセンス
-本リポジトリは MIT ライセンスの下で公開されています。
+## 👨‍💻 開発者アピールポイント
+
+### **技術的な強み**
+- ✅ モダンなReact開発（App Router, Server Components）
+- ✅ Spring Bootでのセキュアな API設計
+- ✅ Docker によるポータブルな開発環境構築
+- ✅ CI/CD パイプラインの設計・運用経験
+
+### **チーム開発への対応力**
+- ✅ Git Flow による効率的なブランチ戦略
+- ✅ 自動テストによる品質保証の仕組み
+- ✅ 技術選定の根拠を明確にした設計判断
+- ✅ 保守性を意識したコード品質の維持
+
+---
+
+## 📄 ライセンス
+
+MIT License - 詳細は [LICENSE](LICENSE) ファイルをご確認ください。
