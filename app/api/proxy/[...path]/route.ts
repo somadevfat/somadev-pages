@@ -26,10 +26,19 @@ async function forwardResponse(backendRes: Response): Promise<NextResponse> {
     headers.set('Content-Type', contentType);
   }
 
-  // Specifically handle and forward the Set-Cookie header
-  const setCookieHeader = backendRes.headers.get('set-cookie');
-  if (setCookieHeader) {
-    headers.set('set-cookie', setCookieHeader);
+  // Handle Set-Cookie headers properly for multiple values
+  // Use getSetCookie() if available (Next.js 15+ / Edge Runtime)
+  if (typeof backendRes.headers.getSetCookie === 'function') {
+    const cookies = backendRes.headers.getSetCookie();
+    for (const cookie of cookies) {
+      headers.append('set-cookie', cookie);
+    }
+  } else {
+    // Fallback for single Set-Cookie header
+    const setCookieHeader = backendRes.headers.get('set-cookie');
+    if (setCookieHeader) {
+      headers.set('set-cookie', setCookieHeader);
+    }
   }
 
   return new NextResponse(data, {
