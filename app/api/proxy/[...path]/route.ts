@@ -8,6 +8,14 @@ function buildHeaders(req: NextRequest): Record<string, string> {
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
+  
+  // デバッグログ追加
+  console.log('🔧 buildHeaders:', {
+    hasToken: !!token,
+    tokenLength: token ? token.length : 0,
+    headers: Object.keys(headers)
+  });
+  
   return headers;
 }
 
@@ -27,13 +35,23 @@ async function forwardResponse(backendRes: Response): Promise<NextResponse> {
     ? responseHeaders.getSetCookie()
     : responseHeaders.get('set-cookie');
 
+  // デバッグログ追加
+  console.log('🍪 forwardResponse Cookie処理:', {
+    backendStatus: backendRes.status,
+    hasCookieHeaders: !!setCookieHeaders,
+    cookieHeaders: setCookieHeaders,
+    allBackendHeaders: Array.from(backendRes.headers.entries())
+  });
+
   if (setCookieHeaders) {
     if (Array.isArray(setCookieHeaders)) {
       setCookieHeaders.forEach((cookie) => {
         headers.append('set-cookie', cookie);
+        console.log('🍪 Appending cookie:', cookie);
       });
     } else if (typeof setCookieHeaders === 'string') {
       headers.set('set-cookie', setCookieHeaders);
+      console.log('🍪 Setting cookie:', setCookieHeaders);
     }
   }
 
@@ -46,6 +64,7 @@ async function forwardResponse(backendRes: Response): Promise<NextResponse> {
 export async function GET(req: NextRequest, { params }: { params: { path: string[] } }) {
   const targetPath = params.path.join('/');
   const url = `${API_BASE}/${targetPath}${req.nextUrl.search}`;
+  console.log('🚀 GET proxy request:', { targetPath, url });
   const backendRes = await fetch(url, { headers: buildHeaders(req) });
   return forwardResponse(backendRes);
 }
@@ -54,6 +73,7 @@ export async function POST(req: NextRequest, { params }: { params: { path: strin
   const targetPath = params.path.join('/');
   const url = `${API_BASE}/${targetPath}`;
   const body = await req.text();
+  console.log('🚀 POST proxy request:', { targetPath, url, bodyLength: body.length });
   const backendRes = await fetch(url, { method: 'POST', body, headers: buildHeaders(req) } as RequestInit);
   return forwardResponse(backendRes);
 }

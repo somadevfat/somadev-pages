@@ -16,9 +16,24 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
+      console.log('🔐 ログイン開始');
+      console.log('🌍 現在のURL:', window.location.href);
+      console.log('🍪 ログイン前のCookie:', document.cookie);
+      
       await login({ email, password });
-      router.replace("/admin/articles");
+      
+      // ログイン成功後、Cookieが設定されているか確認
+      console.log('✅ ログイン成功');
+      console.log('🍪 ログイン後のCookie:', document.cookie);
+      
+      // 少し待ってからリダイレクト（Cookieが設定される時間を確保）
+      setTimeout(() => {
+        console.log('🔄 リダイレクト実行');
+        router.replace("/admin/articles");
+      }, 100);
+      
     } catch (err: unknown) {
+      console.error('❌ ログインエラー:', err);
       setError(err instanceof Error ? err.message : "An unknown error occurred");
     } finally {
       setIsLoading(false);
