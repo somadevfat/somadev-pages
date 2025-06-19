@@ -3,7 +3,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import Cookies from 'js-cookie';
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);

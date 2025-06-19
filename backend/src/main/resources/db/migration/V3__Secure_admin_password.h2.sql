@@ -1,0 +1,2 @@
+-- V3__Secure_admin_password.h2.sql
+-- No-op for H2 database; PostgreSQL-specific migration is in corresponding .postgresql.sql file. 
