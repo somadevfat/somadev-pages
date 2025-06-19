@@ -32,7 +32,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-        Optional<String> jwt = getJwtFromCookie(request);
+        Optional<String> jwt = getJwtFromRequest(request);
 
         if (jwt.isEmpty()) {
             filterChain.doFilter(request, response);
@@ -57,6 +57,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
         filterChain.doFilter(request, response);
+    }
+
+    private Optional<String> getJwtFromRequest(HttpServletRequest request) {
+        // First, try to get JWT from Authorization header
+        Optional<String> authHeader = getJwtFromAuthorizationHeader(request);
+        if (authHeader.isPresent()) {
+            return authHeader;
+        }
+        
+        // If not found in header, try to get from cookie
+        return getJwtFromCookie(request);
+    }
+
+    private Optional<String> getJwtFromAuthorizationHeader(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            return Optional.of(authHeader.substring(7));
+        }
+        return Optional.empty();
     }
 
     private Optional<String> getJwtFromCookie(HttpServletRequest request) {

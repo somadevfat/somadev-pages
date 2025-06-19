@@ -1114,3 +1114,98 @@ Could not resolve placeholder 'app.jwt.secret' in value "${app.jwt.secret}"
 5. ✅ **Testing Strategy**
    - **Manual:** ローカル Docker 環境で `admin@example.com / password` が無効化されること、ログに新パスワードが表示されることを確認。
    - **Integration:** AuthIntegrationTest を新PWで更新する or `admin` で401になることをテスト。
+
+### 🎟️ チケット FE-BUG-03: 管理画面で記事の作成・削除が失敗する問題 (API ベース URL 未設定 & ルート不整合)
+
+- **担当:** Frontend
+- **ブランチ:** `feature/FE-BUG-03-fix-admin-crud`
+- **説明:** 本番環境 (fanda-dev.com) で新規記事作成 `/admin/new` および記事削除が失敗する。原因は ① Next.js プロキシ (`/api/proxy`) が内部ホスト `backend:8080` へフォールバックしており、Vercel 環境で解決できない、② 画面とテストで新規記事ルートが `/admin/new` と `/admin/articles/new` で不一致。
+- **複雑度レベル:** 2 (Simple Enhancement)
+- **ステータス:** 未着手
+
+#### 📝 Level 2 計画ドキュメント (FE-BUG-03: Admin CRUD 修正)
+
+1. 📋 **Overview**
+   - `app/api/proxy/[...path]/route.ts` の `API_BASE` を、`API_BASE_URL_INTERNAL` が未設定の場合は **公開 API URL** (`process.env.NEXT_PUBLIC_API_BASE_URL`) にフォールバックさせる。
+   - Vercel 環境変数に `API_BASE_URL_INTERNAL`（例: `https://api.fanda-dev.com/api`）を追加し、バックエンドへリクエストを正しくルーティング。
+   - 新規記事作成 UI のパスを `/admin/articles/new` に統一し、`Link` とページディレクトリを修正。旧 `/admin/new` へのアクセスはリダイレクトで互換維持。
+
+2. 📁 **Files to Modify / Create**
+   - `app/api/proxy/[...path]/route.ts`
+   - `env.example.txt` (フロントエンド用環境変数を追加)
+   - `app/admin/articles/page.tsx` ("New Article" ボタンの `href` 修正)
+   - `app/admin/new/page.tsx` → **移動:** `app/admin/articles/new/page.tsx` へ
+   - `app/admin/new/page.tsx` **(旧パス)** にリダイレクトロジックを残す (*optional*)
+   - `tests/e2e/article-crud.spec.ts` (期待 URL を `/admin/articles/new` に合わせて更新)
+
+3. 🔄 **Implementation Steps**
+   1. `develop` から新ブランチ `feature/FE-BUG-03-fix-admin-crud` を作成。
+   2. `route.ts` 冒頭で `const API_BASE = process.env.API_BASE_URL_INTERNAL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080/api';` へ変更。
+   3. `env.example.txt` に以下を追記し、README へも反映。
+      ```bash
+      # Frontend ↔ Backend API エンドポイント
+      # 例: https://api.fanda-dev.com/api
+      API_BASE_URL_INTERNAL=
+      NEXT_PUBLIC_API_BASE_URL=
+      ```
+   4. `app/admin/articles/page.tsx` の `Link` を `href="/admin/articles/new"` に変更。
+   5. `app/admin/new/page.tsx` を `mkdir -p app/admin/articles/new` し移動。`export { default } from '../new/page'` を旧ファイルに残してリダイレクト or 削除。
+   6. Playwright テスト `article-crud.spec.ts` の URL 期待値を更新 (`/admin/articles/new`).
+   7. `npm run lint` & `npm run test` をローカルで実行し、全テストグリーンを確認。
+   8. `git push` 後、GitHub CLI で PR 作成 (`gh pr create --base develop --head feature/FE-BUG-03-fix-admin-crud --fill`).
+
+4. ⚠️ **Potential Challenges**
+   - Vercel の環境変数命名ミス・未再デプロイによる値未反映。
+   - `Set-Cookie` ヘッダ転送 (FE-BUG-01) 未解決の環境では作成・削除が 401/403 になる可能性。
+   - 旧 URL `/admin/new` からのリンクやブックマークが存在する場合の互換対応。
+
+5. ✅ **Testing Strategy**
+   - **Manual (Preview):** Vercel preview URL で `/login` → `/admin/articles` → "New Article" → フォーム送信 → 投稿成功 → 削除成功 を確認。
+   - **E2E:** 既存 `article-crud.spec.ts` を更新し、CI でグリーンを確認。
+   - **Production Smoke:** 本番 `fanda-dev.com` で同手順を再確認し、Network タブで `POST /api/contents/articles` リクエストが `200` になることを検証。
+
+### 🎟️ チケット FE-BUG-04: JWT Cookie が保存されず認可 API が 403 になる問題 (Set-Cookie ヘッダ複数値転送)
+
+- **担当:** Frontend
+- **ブランチ:** `feature/FE-BUG-04-cookie-forward-array`
+- **説明:** `AuthController` から返る `Set-Cookie` ヘッダが複数の属性付きで送信される場合、現行の `/api/proxy` では 1 つ目しか転送できずブラウザに JWT Cookie が保存されないケースがある。結果として `/api/contents/**` POST/DELETE が 401/403 となりページ作成・削除が失敗する。
+- **複雑度レベル:** 2 (Simple Enhancement)
+- **ステータス:** 未着手
+
+#### 📝 Level 2 計画ドキュメント (FE-BUG-04: Cookie Forward Array)
+
+1. 📋 **Overview**
+   - `Response.headers.getSetCookie()` (Next.js Edge Runtime / fetch 拡張) を利用し、バックエンドからの **すべての** `Set-Cookie` ヘッダ値を `NextResponse` へ `headers.append('set-cookie', value)` で転送する。
+   - フォールバックとして `headers.get('set-cookie')` をチェックし、単一値しかない場合も転送。
+   - これにより本番環境で JWT Cookie が確実に保存され、認可 API が成功する。
+
+2. 📁 **Files to Modify**
+   - `app/api/proxy/[...path]/route.ts`
+   - `tests/e2e/auth.spec.ts` (Cookie が保存されることのアサートを強化)
+
+3. 🔄 **Implementation Steps**
+   1. `develop` から `feature/FE-BUG-04-cookie-forward-array` を作成。
+   2. `forwardResponse` 内を以下のロジックへ変更：
+      ```ts
+      const res = new Headers();
+      // ... content-type コピー
+      if (backendRes.headers.getSetCookie) {
+        for (const c of backendRes.headers.getSetCookie()) {
+          res.append('set-cookie', c);
+        }
+      } else {
+        const sc = backendRes.headers.get('set-cookie');
+        if (sc) res.set('set-cookie', sc);
+      }
+      ```
+   3. Playwright `auth.spec.ts` に `expect(await page.context().cookies()).toEqual(expect.arrayContaining([{ name: 'token', ... }]))` を追加。
+   4. `npm run lint && npm run test && npm run test:e2e` をパスさせる。
+   5. Push & PR 作成 (`gh pr create`).
+
+4. ⚠️ **Potential Challenges**
+   - Edge Runtime で `getSetCookie()` が undefined の場合 → polyfill 必要だが Next.js 15 では実装済み。
+   - Cookie 文字列中の comma (Expires=) で分割エラー → `getSetCookie()` は安全。
+
+5. ✅ **Testing Strategy**
+   - **Manual:** `/login` 後 DevTools > Application > Cookies に `token` が表示されるか確認。
+   - **E2E:** Playwright でログイン成功後の記事作成・削除まで実行し、全ステップが 2xx で完了することを確認。
