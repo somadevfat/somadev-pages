@@ -22,17 +22,17 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
   const Sidebar = (
     <aside className={`fixed inset-y-0 left-0 z-30 w-64 bg-gray-800 text-white flex flex-col transform transition-transform duration-200 md:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:static md:inset-auto md:transform-none`}>        
-      <div className="p-4 text-2xl font-bold border-b border-gray-700">
+      <div className="p-4 text-xl md:text-2xl font-bold border-b border-gray-700">
         <Link href="/admin" onClick={() => setSidebarOpen(false)}>CMS Admin</Link>
       </div>
       <nav className="flex-1 px-2 py-4 space-y-2 overflow-y-auto">
-        <Link href="/admin" className="block px-4 py-2 rounded hover:bg-gray-700" onClick={() => setSidebarOpen(false)}>
+        <Link href="/admin" className="block px-4 py-2 rounded hover:bg-gray-700 transition-colors" onClick={() => setSidebarOpen(false)}>
           Dashboard
         </Link>
-        <Link href="/admin/articles" className="block px-4 py-2 rounded hover:bg-gray-700" onClick={() => setSidebarOpen(false)}>
+        <Link href="/admin/articles" className="block px-4 py-2 rounded hover:bg-gray-700 transition-colors" onClick={() => setSidebarOpen(false)}>
           Articles
         </Link>
-        <Link href="/admin/new" className="block px-4 py-2 rounded hover:bg-gray-700" onClick={() => setSidebarOpen(false)}>
+        <Link href="/admin/new" className="block px-4 py-2 rounded hover:bg-gray-700 transition-colors" onClick={() => setSidebarOpen(false)}>
           New Post
         </Link>
       </nav>
@@ -40,7 +40,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         <button
           onClick={handleLogout}
           data-testid="logout-button"
-          className="w-full text-left px-4 py-2 rounded hover:bg-red-500 hover:text-white"
+          className="w-full text-left px-4 py-2 rounded hover:bg-red-500 hover:text-white transition-colors"
         >
           Logout
         </button>
@@ -64,12 +64,12 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       {/* Desktop sidebar */}
       <div className="hidden md:block">{Sidebar}</div>
 
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden min-h-0">
         {/* Header */}
-        <header className="flex items-center justify-between px-4 py-2 bg-white shadow md:hidden">
+        <header className="flex items-center justify-between px-4 py-3 bg-white shadow md:hidden border-b">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded"
+            className="text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded p-1"
             aria-label="Open sidebar"
           >
             <svg className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
@@ -80,8 +80,10 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         </header>
 
         {/* Main content */}
-        <main className="flex-1 p-4 md:p-8 overflow-y-auto max-w-7xl mx-auto w-full">
-          {children}
+        <main className="flex-1 p-4 md:p-6 overflow-y-auto bg-gray-50">
+          <div className="max-w-7xl mx-auto h-full">
+            {children}
+          </div>
         </main>
       </div>
     </div>
