@@ -20,5 +20,5 @@ COPY --from=build /workspace/target/*.jar app.jar
 # ポート8080を開放
 EXPOSE 8080
 
-# コンテナ起動時にJARファイルを実行
-ENTRYPOINT ["java","-jar","/app.jar"] 
+# コンテナ起動時にJARファイルを実行（JAVA_OPTS環境変数を使用）
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar /app.jar"] 
