@@ -949,3 +949,47 @@ Could not resolve placeholder 'app.jwt.secret' in value "${app.jwt.secret}"
 7. ✅ **Testing Strategy**
    - **Manual:** ローカルでフッターが期待通りに表示されるかをChrome DevToolsで確認。
    - **E2E:** Playwright テストでリンクが2つのみであり、クリック時にそれぞれ `/contact` `/blog` に遷移することを確認。
+
+### 🎟️ チケット OPS-02: 本番VMの構成同期と環境変数修正
+
+- **担当:** DevOps
+- **ブランチ:** `feature/OPS-02-sync-production-with-main`
+- **説明:** 本番サーバのコード/コンテナ構成を GitHub `main` ブランチと完全一致させ、APP_ADMIN_ 環境変数と Flyway マイグレーション不足問題（roles テーブル）を解消する。
+- **複雑度レベル:** 2 (Simple Enhancement)
+
+#### 📝 Level 2 Plan (OPS-02)
+
+1. 📋 **Overview**
+   - main ブランチ最新コミットへサーバコードを強制同期 (`git reset --hard origin/main`)。
+   - `.env` に `APP_ADMIN_EMAIL / APP_ADMIN_PASSWORD` を追加し、旧 `ADMIN_` 行を削除。
+   - `docker-compose.yml` に `env_file` 指定が反映されているか確認。
+   - Flyway 用 V2 マイグレーション (`roles`, `user_roles`) を main に含める。DB 初期化または既存スキーマへ適用。
+
+2. 📁 **Files to Modify**
+   - `.env` (サーバ側)
+   - `docker-compose.yml`
+   - `backend/src/main/resources/db/migration/V2__Create_roles_tables.sql`（main へマージ済み確認）
+
+3. 🔄 **Implementation Steps**
+   1. ローカルでブランチ `feature/OPS-02-sync-production-with-main` を作成。
+   2. 必要な修正（README への手順追記等）があれば commit → PR → main merge。
+   3. 本番 VM で以下を実行:
+      ```bash
+      git fetch origin && git checkout main && git reset --hard origin/main
+      docker-compose down --remove-orphans
+      docker volume rm somadev-pages_postgres_data   # ← データ初期化が必要な場合
+      docker-compose up -d --build
+      ```
+   4. コンテナ内環境変数確認:
+      `docker-compose exec backend env | grep APP_ADMIN`
+   5. Flyway ログで V2 マイグレーション適用を確認。
+   6. `users` テーブルに管理者ユーザが 1 行生成されているか検証。
+
+4. ⚠️ **Potential Challenges**
+   - 旧バージョンの docker-compose (v1) による `ContainerConfig` エラー再発 → `docker system prune -af` でキャッシュを一掃し再ビルド。
+   - 他の開発者ローカルリポジトリとの履歴不一致→ `git fetch && git reset --hard origin/main` を周知。
+
+5. ✅ **Testing Strategy**
+   - Flyway マイグレーションログ確認で `Successfully applied 2 migrations` を確認。
+   - Postman/curl で `/api/auth/login` エンドポイントへ新管理者でログインし、200 OK と JWT 発行を検証。
+   - Playwright E2E （CI パイプライン）を main ブランチマージ後に自動実行し、全テストグリーンを確認。

@@ -22,8 +22,10 @@ import com.soma.backend.repository.RoleRepository;
 import com.soma.backend.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
+@Slf4j
 @RequiredArgsConstructor
 @Profile("!test")
 public class DataInitializer implements CommandLineRunner {
@@ -42,6 +44,7 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        log.info("Running DataInitializer with adminEmail={} and adminPassword set? {}", adminEmail, adminPassword != null);
         // Initialize roles
         if (roleRepository.findByName(ERole.ROLE_ADMIN).isEmpty()) {
             roleRepository.save(new Role(ERole.ROLE_ADMIN));
@@ -60,6 +63,7 @@ public class DataInitializer implements CommandLineRunner {
                     .roles(Set.of(adminRole))
                     .build();
             userRepository.save(admin);
+            log.info("Admin user created: {}", adminEmail);
         }
 
         // Create dummy content for testing
