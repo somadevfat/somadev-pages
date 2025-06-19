@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-@Profile("!test")
+@Profile({"local", "dev"})
 public class DataInitializer implements CommandLineRunner {
 
     @Value("${app.admin.email}")
@@ -45,6 +45,11 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         log.info("Running DataInitializer with adminEmail={} and adminPassword set? {}", adminEmail, adminPassword != null);
+
+        if (adminEmail == null || adminEmail.isBlank() || adminPassword == null || adminPassword.isBlank()) {
+            throw new IllegalStateException("APP_ADMIN_EMAIL または APP_ADMIN_PASSWORD が設定されていません。環境変数または application-*.properties に設定してください。");
+        }
+
         // Initialize roles
         if (roleRepository.findByName(ERole.ROLE_ADMIN).isEmpty()) {
             roleRepository.save(new Role(ERole.ROLE_ADMIN));
