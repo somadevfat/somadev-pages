@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-@Profile({"local", "dev"})
+@Profile({"local", "dev", "prod"})
 public class DataInitializer implements CommandLineRunner {
 
     @Value("${app.admin.email}")
@@ -50,6 +50,12 @@ public class DataInitializer implements CommandLineRunner {
             throw new IllegalStateException("APP_ADMIN_EMAIL または APP_ADMIN_PASSWORD が設定されていません。環境変数または application-*.properties に設定してください。");
         }
 
+        // Skip initialization if admin already exists
+        if (userRepository.findByEmail(adminEmail).isPresent()) {
+            log.info("Admin user already exists. Skipping DataInitializer.");
+            return;
+        }
+
         // Initialize roles
         if (roleRepository.findByName(ERole.ROLE_ADMIN).isEmpty()) {
             roleRepository.save(new Role(ERole.ROLE_ADMIN));
@@ -59,17 +65,15 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         // Create admin user
-        if (userRepository.findByEmail(adminEmail).isEmpty()) {
-            Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
-                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-            User admin = User.builder()
-                    .email(adminEmail)
-                    .password(passwordEncoder.encode(adminPassword))
-                    .roles(Set.of(adminRole))
-                    .build();
-            userRepository.save(admin);
-            log.info("Admin user created: {}", adminEmail);
-        }
+        Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+        User admin = User.builder()
+                .email(adminEmail)
+                .password(passwordEncoder.encode(adminPassword))
+                .roles(Set.of(adminRole))
+                .build();
+        userRepository.save(admin);
+        log.info("Admin user created: {}", adminEmail);
 
         // Create dummy content for testing
         if (contentRepository.findByTypeAndSlug("articles", "dummy-post").isEmpty()) {
