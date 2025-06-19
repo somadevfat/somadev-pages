@@ -1027,3 +1027,90 @@ Could not resolve placeholder 'app.jwt.secret' in value "${app.jwt.secret}"
 5. ✅ **Testing Strategy**
    - **Manual:** ブラウザでログインし、`Application > Cookies` タブに `token` が存在することを確認。
    - **E2E:** Playwright テストで `/login` フローを実行し、`token` Cookie が設定され、`/admin/articles` に遷移することを確認。
+
+### 🎟️ チケット FE-BUG-02: ログアウトできない問題 (HttpOnly Cookie 未削除)
+
+- **担当:** Frontend
+- **ブランチ:** `feature/FE-BUG-02-logout-cookie-clear`
+- **説明:** JWT を HttpOnly Cookie として保存しているため、フロント側の `js-cookie` で削除できずログアウトしてもセッションが残る。Next.js API ルートで `Set-Cookie` ヘッダに無効化 Cookie (`Max-Age=0`) を返して解決する。
+- **複雑度レベル:** 2 (Simple Enhancement)
+- **ステータス:** 未着手
+
+#### 📝 Level 2 計画ドキュメント (FE-BUG-02: ログアウト Cookie 無効化)
+
+1. 📋 **Overview**
+   - `POST /api/auth/logout` を実装し、`token` Cookie を失効させる。
+   - 管理レイアウトのログアウトボタンはこのエンドポイントを呼び出すよう修正。
+
+2. 📁 **Files to Modify / Create**
+   - `app/api/auth/logout/route.ts` (新規)
+   - `app/admin/layout.tsx` (`handleLogout` 修正)
+   - `tests/e2e/auth.spec.ts` (Cookie が削除されるテスト追加)
+
+3. 🔄 **Implementation Steps**
+   1. `develop` から `feature/FE-BUG-02-logout-cookie-clear` ブランチを作成。
+   2. `logout` API ルートを作成し、`Set-Cookie: token=; Path=/; Max-Age=0; HttpOnly; SameSite=Strict` を返す。
+   3. `handleLogout` 内で `fetch('/api/auth/logout', { method: 'POST' })` を await し、完了後 `/login` へリダイレクト。
+   4. 手動確認: `/admin` → Logout → `/login` で Cookie `token` が消えることを DevTools で確認。
+   5. Playwright テスト更新: ログアウト後に `document.cookie` に `token=` が含まれないことをアサート。
+   6. `npm run lint` と `npm run test` をパスさせる。
+   7. Push & PR 作成、develop へマージ依頼。
+
+4. ⚠️ **Potential Challenges**
+   - `SameSite=Strict` で問題ないかブラウザ互換性を確認。
+   - CSRF 対策として後日トークンや Origin チェックが必要になる可能性。
+
+5. ✅ **Testing Strategy**
+   - **Manual:** ブラウザ DevTools で Cookie が削除されることを確認。
+   - **E2E:** Playwright でログアウトフローを自動検証し、Cookie が存在しないことをテスト。
+
+### 🎟️ チケット BE-BUG-03: 既存 admin パスワード無効化 (Flyway マイグレーション)
+
+- **担当:** Backend/DevOps
+- **ブランチ:** `feature/BE-BUG-03-secure-admin-password`
+- **説明:** デフォルト `admin@example.com / password` がDBに残存している環境でログインできてしまう問題を解決するため、Flyway V3 マイグレーションで既存パスワードを強制ランダム化する。`NOTICE` で新パスワードをログに出力し、運用側で安全に保管する。
+- **複雑度レベル:** 2 (Simple Enhancement)
+- **ステータス:** 未着手
+
+#### 📝 Level 2 計画ドキュメント (BE-BUG-03: Secure Admin Password)
+
+1. 📋 **Overview**
+   - `backend/src/main/resources/db/migration/V3__Secure_admin_password.sql` を追加し、既存 `admin@example.com` のパスワードを SHA256 乱数 + `pgcrypto` でハッシュ化した強力パスワードへ更新する。
+   - 同マイグレーションで `pgcrypto` 拡張が未有効の場合は `CREATE EXTENSION IF NOT EXISTS pgcrypto;` を実行。
+   - Flyway が migrate されるタイミングで適用されるため、**DB 再作成は不要**、再デプロイ (backend 再起動) だけで反映。
+
+2. 📁 **Files to Modify / Create**
+   - `backend/src/main/resources/db/migration/V3__Secure_admin_password.sql` (新規)
+   - `docs/PROJECT_DESIGN.md` or README に運用手順追記 (任意)
+
+3. 🔄 **Implementation Steps**
+   1. `develop` から `feature/BE-BUG-03-secure-admin-password` を作成。
+   2. SQL スクリプトを作成:
+      ```sql
+      -- Enable pgcrypto for gen_random_bytes
+      CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+      DO $$
+      DECLARE
+          new_pw TEXT := encode(gen_random_bytes(32), 'hex');
+      BEGIN
+          UPDATE users
+          SET password = crypt(new_pw, gen_salt('bf'))
+          WHERE email = 'admin@example.com';
+
+          RAISE NOTICE 'New admin password (store securely!): %', new_pw;
+      END $$;
+      ```
+   3. ローカルで `./mvnw flyway:migrate` または `docker compose up backend` でマイグレーションが適用されることを確認し、ログに新パスワードが出力されることをチェック。
+   4. `npm run lint` (変更なし)
+   5. `git push` → PR 作成 → develop マージ。
+   6. develop マージ後、**backend コンテナ再起動** (本番/preview) → V3 適用を確認。
+   7. 運用チームがログから新パスワードを取得し、秘密管理ツール (1Password 等) に保存。
+
+4. ⚠️ **Potential Challenges**
+   - `pgcrypto` が利用できないDBホスティングの場合は別途関数でランダム生成が必要。
+   - ログにパスワードが漏れるため、CI/CD ログの公開範囲に注意し、`NOTICE` を Slack の private チャンネル等に転送する運用を検討。
+
+5. ✅ **Testing Strategy**
+   - **Manual:** ローカル Docker 環境で `admin@example.com / password` が無効化されること、ログに新パスワードが表示されることを確認。
+   - **Integration:** AuthIntegrationTest を新PWで更新する or `admin` で401になることをテスト。
