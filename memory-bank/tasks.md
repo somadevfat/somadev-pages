@@ -993,3 +993,37 @@ Could not resolve placeholder 'app.jwt.secret' in value "${app.jwt.secret}"
    - Flyway マイグレーションログ確認で `Successfully applied 2 migrations` を確認。
    - Postman/curl で `/api/auth/login` エンドポイントへ新管理者でログインし、200 OK と JWT 発行を検証。
    - Playwright E2E （CI パイプライン）を main ブランチマージ後に自動実行し、全テストグリーンを確認。
+
+### 🎟️ チケット FE-BUG-01: ログインできない問題 (Cookie 転送バグ)
+
+- **担当:** Frontend
+- **ブランチ:** `feature/FE-BUG-01-login-cookie-proxy`
+- **説明:** バックエンドから送られる `Set-Cookie` ヘッダが Next.js の API プロキシ (`/api/proxy`) でブラウザへ転送されず、JWT Cookie が保存されないためログインが完了しない。`route.ts` で `set-cookie` ヘッダをそのまま応答にコピーして解決する。
+- **複雑度レベル:** 2 (Simple Enhancement)
+- **ステータス:** 未着手
+
+#### 📝 Level 2 計画ドキュメント (FE-BUG-01: ログイン Cookie 転送修正)
+
+1. 📋 **Overview**
+   - `app/api/proxy/[...path]/route.ts` の各 HTTP メソッドで、バックエンド応答の `set-cookie` ヘッダを取得し、Next.js の `NextResponse` に付与してフロントエンドへ転送する。
+
+2. 📁 **Files to Modify / Create**
+   - `app/api/proxy/[...path]/route.ts`
+   - `tests/e2e/auth.spec.ts` (ログイン E2E テストの Cookie 確認を追加)
+
+3. 🔄 **Implementation Steps**
+   1. `develop` から新ブランチ `feature/FE-BUG-01-login-cookie-proxy` を作成。
+   2. `route.ts` に共通関数 `forwardResponse` を作成し、`backendRes.headers.get('set-cookie')` を取得して `NextResponse` にコピー。ヘッダ大小文字を考慮し複数値にも対応。
+   3. 各 HTTP メソッド (`GET`, `POST`, `PUT`, `DELETE`) で `forwardResponse` を使用してレスポンスを生成。
+   4. `npm run dev` で `/login` → `/admin/articles` へ正常リダイレクトし、DevTools で `token` Cookie が存在することを確認。
+   5. Playwright `auth.spec.ts` を更新し、ログイン後に `document.cookie` に `token=` が含まれることをアサート。
+   6. `npm run lint` と `npm run test` をパスさせる。
+   7. `git push` 後、GitHub CLI で PR を作成し、base=`develop` へマージを依頼。
+
+4. ⚠️ **Potential Challenges**
+   - `Set-Cookie` ヘッダは大小文字や複数値があり得るため、`backendRes.headers.getSetCookie?` のパターンを検証する必要がある。
+   - 他のヘッダ (`location` など) が必要な場合は追加転送が必要になる可能性。
+
+5. ✅ **Testing Strategy**
+   - **Manual:** ブラウザでログインし、`Application > Cookies` タブに `token` が存在することを確認。
+   - **E2E:** Playwright テストで `/login` フローを実行し、`token` Cookie が設定され、`/admin/articles` に遷移することを確認。
