@@ -1027,3 +1027,39 @@ Could not resolve placeholder 'app.jwt.secret' in value "${app.jwt.secret}"
 5. ✅ **Testing Strategy**
    - **Manual:** ブラウザでログインし、`Application > Cookies` タブに `token` が存在することを確認。
    - **E2E:** Playwright テストで `/login` フローを実行し、`token` Cookie が設定され、`/admin/articles` に遷移することを確認。
+
+### 🎟️ チケット FE-BUG-02: ログアウトできない問題 (HttpOnly Cookie 未削除)
+
+- **担当:** Frontend
+- **ブランチ:** `feature/FE-BUG-02-logout-cookie-clear`
+- **説明:** JWT を HttpOnly Cookie として保存しているため、フロント側の `js-cookie` で削除できずログアウトしてもセッションが残る。Next.js API ルートで `Set-Cookie` ヘッダに無効化 Cookie (`Max-Age=0`) を返して解決する。
+- **複雑度レベル:** 2 (Simple Enhancement)
+- **ステータス:** 未着手
+
+#### 📝 Level 2 計画ドキュメント (FE-BUG-02: ログアウト Cookie 無効化)
+
+1. 📋 **Overview**
+   - `POST /api/auth/logout` を実装し、`token` Cookie を失効させる。
+   - 管理レイアウトのログアウトボタンはこのエンドポイントを呼び出すよう修正。
+
+2. 📁 **Files to Modify / Create**
+   - `app/api/auth/logout/route.ts` (新規)
+   - `app/admin/layout.tsx` (`handleLogout` 修正)
+   - `tests/e2e/auth.spec.ts` (Cookie が削除されるテスト追加)
+
+3. 🔄 **Implementation Steps**
+   1. `develop` から `feature/FE-BUG-02-logout-cookie-clear` ブランチを作成。
+   2. `logout` API ルートを作成し、`Set-Cookie: token=; Path=/; Max-Age=0; HttpOnly; SameSite=Strict` を返す。
+   3. `handleLogout` 内で `fetch('/api/auth/logout', { method: 'POST' })` を await し、完了後 `/login` へリダイレクト。
+   4. 手動確認: `/admin` → Logout → `/login` で Cookie `token` が消えることを DevTools で確認。
+   5. Playwright テスト更新: ログアウト後に `document.cookie` に `token=` が含まれないことをアサート。
+   6. `npm run lint` と `npm run test` をパスさせる。
+   7. Push & PR 作成、develop へマージ依頼。
+
+4. ⚠️ **Potential Challenges**
+   - `SameSite=Strict` で問題ないかブラウザ互換性を確認。
+   - CSRF 対策として後日トークンや Origin チェックが必要になる可能性。
+
+5. ✅ **Testing Strategy**
+   - **Manual:** ブラウザ DevTools で Cookie が削除されることを確認。
+   - **E2E:** Playwright でログアウトフローを自動検証し、Cookie が存在しないことをテスト。
