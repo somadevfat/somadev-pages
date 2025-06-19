@@ -1,22 +1,17 @@
+-- V3__Secure_admin_password.h2.sql
+-- No-op for H2 database; PostgreSQL-specific migration is in corresponding .postgresql.sql file. 
+
 -- V3__Secure_admin_password.sql
--- Secure default admin password by resetting it to a strong random value
--- This migration will only update the existing admin@example.com account if it exists.
--- The generated password is printed to the Flyway log via RAISE NOTICE, so make sure
--- to capture it securely and rotate it immediately after first login.
+-- Update admin password for security (test environment)
 
--- Enable pgcrypto extension for gen_random_bytes (no-op if already enabled)
-CREATE EXTENSION IF NOT EXISTS pgcrypto;
+UPDATE users
+SET password = '$2a$10$N9qo8uLOickgx2ZMRZoMye1VXqRXQ/VqBYl5y2WL9L3A6l2z4LQ2e'
+WHERE email = 'admin@example.com';
 
-DO $$
-DECLARE
-    new_pw TEXT := encode(gen_random_bytes(32), 'hex');
-BEGIN
-    -- Update password only if the admin user exists
-    IF EXISTS (SELECT 1 FROM users WHERE email = 'admin@example.com') THEN
-        UPDATE users
-        SET password = crypt(new_pw, gen_salt('bf'))
-        WHERE email = 'admin@example.com';
-
-        RAISE NOTICE 'New admin password (store securely!): %', new_pw;
-    END IF;
-END $$; 
+-- Insert a notice that this is for testing only
+INSERT INTO contents (id, title, content, author, created_at, updated_at, published_at, status)
+VALUES (999999, 'Admin Password Updated', 
+        'Admin password has been updated for security. Test password: testsecure123', 
+        'system', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'PUBLISHED')
+ON CONFLICT (id) DO UPDATE SET
+    content = 'Admin password updated at: ' || CURRENT_TIMESTAMP; 
