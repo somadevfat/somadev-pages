@@ -26,7 +26,7 @@ jobs:
 
       - name: Copy compose file to GCE
         run: |
-          gcloud compute scp docker-compose.prod.yml ${{ vars.GCE_INSTANCE_NAME }}:/opt/somadev-pages/docker-compose.prod.yml --zone=${{ vars.GCP_ZONE }} --project=${{ vars.GCP_PROJECT_ID }}
+          gcloud compute scp docker-compose.prod.yml somahiranodev@${{ vars.GCE_INSTANCE_NAME }}:/opt/somadev-pages/docker-compose.prod.yml --zone=${{ vars.GCP_ZONE }} --project=${{ vars.GCP_PROJECT_ID }}
 
       - name: Deploy to GCE
         env:
@@ -36,7 +36,7 @@ jobs:
           GH_USER: ${{ github.actor }}
           GH_TOKEN: ${{ secrets.GHCR_PAT }}
         run: |
-          gcloud compute ssh --zone "$GCE_ZONE" "$GCE_INSTANCE" --project "$GCE_PROJECT" --command="
+          gcloud compute ssh somahiranodev@"$GCE_INSTANCE" --zone "$GCE_ZONE" --project "$GCE_PROJECT" --command="
             set -e
             
             echo 'Logging into GitHub Container Registry...'
