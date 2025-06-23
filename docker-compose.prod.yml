@@ -19,7 +19,7 @@ services:
       retries: 5
 
   backend:
-    image: somapages/backend:latest # Replace with your actual production image
+    image: ghcr.io/somadevfat/soma-pages/backend:latest # Replace with your actual production image
     restart: always
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB}
@@ -31,7 +31,7 @@ services:
         condition: service_healthy
 
   frontend:
-    image: somapages/frontend:latest # Replace with your actual production image
+    image: ghcr.io/somadevfat/soma-pages/frontend:latest # Replace with your actual production image
     restart: always
     ports:
       - "3000:3000"

@@ -1242,3 +1242,92 @@ Could not resolve placeholder 'app.jwt.secret' in value "${app.jwt.secret}"
 5. ✅ **Testing Strategy**
    - **Manual:** `/login` 後 DevTools > Application > Cookies に `token` が表示されるか確認。
    - **E2E:** Playwright でログイン成功後の記事作成・削除まで実行し、全ステップが 2xx で完了することを確認。
+
+## フェーズ 5.5: 自動デプロイ (GCP Deployment Phase)
+
+### 🎟️ チケット CD-02: GHCR から GCP VM への自動デプロイ (Level 3)
+
+- **担当:** DevOps
+- **ブランチ:** `feature/CD-02-ghcr-to-gcp-deploy`
+- **説明:** GitHub Actions で GHCR へプッシュされた Docker イメージを、Google Compute Engine (GCE) VM へ自動デプロイするワークフローを構築します。
+- **Input:** 
+    - `.github/workflows/ci.yml` (既存 GHCR Push job)
+    - GCP サービスアカウント JSON キー (`GCP_SA_KEY` GitHub Secret)
+    - VM で稼働する `docker-compose.prod.yml`
+- **Output:**
+    - `.github/workflows/deploy-gcp.yml` が追加され、`main` ブランチ push または GHCR image push 後に起動。
+    - ワークフロー内で `google-github-actions/auth@v2` を用いて SA キーで認証し、`gcloud compute` SSH コマンドで VM に接続。
+    - VM 側で `docker compose pull && docker compose up -d` を実行し、最新イメージへ更新。
+    - デプロイ成功後 Slack へ通知 (optional).
+- **ステータス:** 未着手
+
+#### 📝 Level 3 計画ドキュメント (CD-02)
+
+##### 1. Requirements Analysis (要件分析)
+- main ブランチ／GHCR イメージ push をトリガに、本番 VM へ自動ロールアウトを行う。
+- デプロイ結果が Slack または GitHub Deployments API で可視化されること。
+- ダウンタイムは 30 秒以内に抑え、障害時は直前のイメージへロールバック可能とする。
+- Secrets は長期鍵ではなく **Workload Identity Federation (OIDC)** に移行可能な構成を前提とする。
+
+##### 2. Components Affected (影響範囲)
+- 新規: `.github/workflows/deploy-gcp.yml`
+- 既存: `docker-compose.prod.yml` (イメージ名を `ghcr.io/<org>/<repo>/backend:<tag>` 等に更新)
+- リポジトリ Secrets / Actions Variables
+- ドキュメント: `docs/deployment.md` (作成)
+
+##### 3. Architecture Considerations (アーキテクチャ検討)
+- 単一 GCE VM (Ubuntu 24.04) 上で `docker compose` により frontend/backend/postgres を稼働。
+- GHCR から pull するため、VM 側にも `docker login ghcr.io` を行う (`GHCR_PAT` もしくは `GITHUB_ACTOR \: TOKEN`).
+- GCP への認証方式は第一段階では SA JSON キー、将来的に OIDC へ移行できるようワークフローをモジュール化。
+- 障害時ロールバック: `docker compose up -d --rollback` は無いので、前タグを `docker compose up -d target=:old` で手動切替。ワークフローに `rollback` manual trigger を用意。
+
+##### 4. Implementation Strategy (実装戦略)
+1. **Secrets 設定**
+   - `GCP_SA_KEY`: base64 でエンコードした SA JSON
+   - `GCP_PROJECT_ID`, `GCP_REGION`, `GCE_INSTANCE_NAME`, `GCE_SSH_USER`
+   - `GHCR_PAT`: VM 内 `docker login` 用 PAT (権限: read:packages)
+2. **Workflow 作成** `deploy-gcp.yml`
+   1. `on: workflow_dispatch, push: branches: [main]`
+   2. `jobs.deploy`:
+      - Checkout → Auth → Setup gcloud → `gcloud compute ssh` コマンド実行
+      - SSH script 内部:
+        ```bash
+        docker login ghcr.io -u USER -p $GHCR_PAT
+        cd /opt/soma-pages
+        docker compose pull
+        docker compose up -d
+        ```
+   3. Slack 通知 step (optional) `8398a7/action-slack`.
+3. **compose 更新**
+   - `image: ghcr.io/<org>/<repo>/backend:${TAG}`
+   - `:latest` タグを付与するか、Actions run commit SHA でタグ付とし `latest` に meta tag。
+4. **ドキュメント** `docs/deployment.md`
+   - Secrets 追加手順、VM 側初期セットアップ、ロールバック方法を記載。
+
+##### 5. Detailed Steps & Checklist
+- [ ] Secrets 登録 (`GCP_SA_KEY`, `GHCR_PAT`, `GCP_*` 変数)
+- [ ] `docker-compose.prod.yml` イメージ名を GHCR 形式に変更
+- [ ] `deploy-gcp.yml` 作成
+- [ ] VM 初期設定 (`docker login ghcr.io`、`/opt/soma-pages` ディレクトリ作成)
+- [ ] Slack Webhook URL 登録 (任意)
+- [ ] Manual trigger でデプロイテスト → 成功確認
+- [ ] README / docs 更新
+- [ ] PR 作成 → レビュー → develop → main
+
+##### 6. Dependencies
+- google-github-actions/auth@v2, setup-gcloud@v1
+- docker/login-action@v3, docker/setup-buildx-action@v3
+- Slack Webhook URL (optional)
+
+##### 7. Challenges & Mitigations
+| 課題 | 対応策 |
+|------|-------|
+| SA JSON 漏洩リスク | 権限を最低限 (Compute Admin + Artifact Registry Reader) に限定し、将来 OIDC へ移行 |
+| ダウンタイム | Deployment コマンドを `pull` → `up -d` のシーケンスにし、バックエンド先起動待ち (`depends_on`) で数秒化 |
+| バージョン不一致 | compose に `:sha` を使い、`latest` に依存しない |
+| ロールバックの手動さ | `workflow_dispatch` 入力で `rollback_to_tag` を受け取り、同スクリプトで `docker compose up -d` を実装 |
+
+##### 8. Creative Phase Components (要クリエイティブか?)
+- 標準的な GitHub Actions + SSH デプロイであり、既存パターンを踏襲できるため **CREATIVE フェーズ不要**
+
+⏭️ NEXT MODE: IMPLEMENT MODE
