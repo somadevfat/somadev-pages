@@ -6,6 +6,10 @@ on:
       - main
   workflow_dispatch:
 
+permissions:
+  contents: read
+  packages: read # デプロイは読み取りだけで良い
+
 jobs:
   deploy:
     name: Deploy to GCP Compute Engine
