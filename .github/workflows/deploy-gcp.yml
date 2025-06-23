@@ -46,10 +46,10 @@ jobs:
             cd /opt/somadev-pages
 
             echo 'Pulling latest images from GHCR...'
-            docker compose -f docker-compose.prod.yml pull
+            docker-compose -f docker-compose.prod.yml pull
 
             echo 'Starting application with new images...'
-            docker compose -f docker-compose.prod.yml up -d --remove-orphans
+            docker-compose -f docker-compose.prod.yml up -d --remove-orphans
 
             echo 'Cleaning up unused Docker images...'
             docker image prune -af
