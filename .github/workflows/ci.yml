@@ -179,11 +179,6 @@ jobs:
       id-token: write # OIDC認証に必要
 
     steps:
-      - name: Debug GCP Vars
-        run: |
-          echo "WIF Provider is set: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER != '' }}"
-          echo "Service Account is set: ${{ vars.GCP_SERVICE_ACCOUNT != '' }}"
-
       - name: Authenticate to Google Cloud
         id: auth
         uses: google-github-actions/auth@v2
