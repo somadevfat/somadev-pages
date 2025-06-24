@@ -194,11 +194,11 @@ jobs:
 
       - name: Copy compose file to GCE
         run: |
-          gcloud compute scp docker-compose.prod.yml somahiranodev@${{ vars.GCE_INSTANCE_NAME }}:/opt/somadev-pages/docker-compose.prod.yml --zone=${{ vars.GCP_ZONE }} --project=${{ vars.GCP_PROJECT_ID }}
+          gcloud compute scp docker-compose.prod.yml somahiranodev@${{ vars.GCP_VM_NAME }}:/opt/somadev-pages/docker-compose.prod.yml --zone=${{ vars.GCP_ZONE }} --project=${{ vars.GCP_PROJECT_ID }}
 
       - name: Deploy to GCE
         env:
-          GCE_INSTANCE: ${{ vars.GCE_INSTANCE_NAME }}
+          GCE_INSTANCE: ${{ vars.GCP_VM_NAME }}
           GCE_PROJECT: ${{ vars.GCP_PROJECT_ID }}
           GCE_ZONE: ${{ vars.GCP_ZONE }}
           GH_USER: ${{ github.actor }}
