@@ -1,19 +1,6 @@
 version: '3.8'
 
 services:
-  frontend:
-    image: ghcr.io/somadevfat/somadev-pages/frontend:latest
-    container_name: soma_frontend_prod
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=production
-      - NEXT_PUBLIC_API_BASE_URL=/api/proxy
-      - API_BASE_URL_INTERNAL=http://backend:8080/api
-    restart: always
-    depends_on:
-      - backend
-
   backend:
     image: ghcr.io/somadevfat/somadev-pages/backend:latest
     container_name: soma_backend_prod
