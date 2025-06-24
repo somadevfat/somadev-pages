@@ -1,45 +1,47 @@
 version: '3.8'
 
 services:
-  postgres:
-    image: postgres:15
-    restart: always
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  backend:
-    image: ghcr.io/somadevfat/soma-pages/backend:latest # Replace with your actual production image
-    restart: always
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB}
-      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
-      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
-      - CONTENT_ROOT_PATH=/app/content
-    depends_on:
-      postgres:
-        condition: service_healthy
-
   frontend:
-    image: ghcr.io/somadevfat/soma-pages/frontend:latest # Replace with your actual production image
-    restart: always
+    image: ghcr.io/somadevfat/somadev-pages/frontend:latest
+    container_name: soma_frontend_prod
     ports:
       - "3000:3000"
     environment:
-      - API_BASE_URL_INTERNAL=http://backend:8080/api
+      - NODE_ENV=production
       - NEXT_PUBLIC_API_BASE_URL=/api/proxy
+      - API_BASE_URL_INTERNAL=http://backend:8080/api
+    restart: always
     depends_on:
       - backend
 
+  backend:
+    image: ghcr.io/somadevfat/somadev-pages/backend:latest
+    container_name: soma_backend_prod
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/somadb
+      - SPRING_DATASOURCE_USERNAME=soma
+      - SPRING_DATASOURCE_PASSWORD=somapassword
+      - JWT_SECRET=your-very-long-secret-key-for-production-at-least-32-characters
+      - ADMIN_PASSWORD=admin123
+    restart: always
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15-alpine
+    container_name: soma_db_prod
+    restart: always
+    environment:
+      - POSTGRES_DB=somadb
+      - POSTGRES_USER=soma
+      - POSTGRES_PASSWORD=somapassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+
 volumes:
-  postgres_data: 
+  postgres_data_prod: 
