@@ -179,6 +179,9 @@ jobs:
       id-token: write # OIDC認証に必要
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Authenticate to Google Cloud
         id: auth
         uses: google-github-actions/auth@v2
