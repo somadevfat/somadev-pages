@@ -179,11 +179,14 @@ jobs:
       id-token: write # OIDC認証に必要
 
     steps:
+      - name: Decode Service Account Key
+        run: echo "${{ secrets.GCP_SA_KEY_BASE64 }}" | base64 -d > /tmp/sa-key.json
+
       - name: Authenticate to Google Cloud
         id: auth
         uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          credentials_json: /tmp/sa-key.json
 
       - name: Set up gcloud CLI
         uses: google-github-actions/setup-gcloud@v2
