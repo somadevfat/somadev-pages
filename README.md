@@ -168,3 +168,4 @@ graph LR
 ## 📄 ライセンス
 
 MIT License - 詳細は [LICENSE](LICENSE) ファイルをご確認ください。
+
