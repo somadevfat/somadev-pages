@@ -21,6 +21,8 @@ services:
   backend:
     image: somapages/backend:latest # Replace with your actual production image
     restart: always
+    ports:
+      - "8080:8080"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB}
       - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
