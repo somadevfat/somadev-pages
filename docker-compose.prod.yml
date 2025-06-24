@@ -5,6 +5,7 @@ services:
     image: ghcr.io/somadevfat/somadev-pages/backend:latest
     container_name: soma_backend_prod
     ports:
+      - "80:8080"
       - "8080:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
