@@ -215,11 +215,18 @@ jobs:
             echo 'Navigating to project directory...'
             cd /opt/somadev-pages
 
+            echo 'Stopping and removing existing containers and volumes...'
+            docker-compose -f docker-compose.prod.yml down --remove-orphans --volumes
+
+            echo 'Pruning dangling containers and volumes...'
+            docker container prune -f
+            docker volume prune -f
+
             echo 'Pulling latest images from GHCR...'
             docker-compose -f docker-compose.prod.yml pull
 
-            echo 'Starting application with new images...'
-            docker-compose -f docker-compose.prod.yml up -d --remove-orphans
+            echo 'Starting application with new images (force recreate)...'
+            docker-compose -f docker-compose.prod.yml up -d --force-recreate --remove-orphans
 
             echo 'Cleaning up unused Docker images...'
             docker image prune -af
