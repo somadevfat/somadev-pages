@@ -167,4 +167,57 @@ jobs:
           file: ./backend/Dockerfile
           push: true
           tags: ${{ steps.meta_backend.outputs.tags }}
-          labels: ${{ steps.meta_backend.outputs.labels }} 
+          labels: ${{ steps.meta_backend.outputs.labels }}
+
+  deploy:
+    name: Deploy to GCP Compute Engine
+    runs-on: ubuntu-latest
+    needs: [publish-ghcr] # publish-ghcrジョブの完了を待つ
+
+    permissions:
+      contents: read
+      id-token: write # OIDC認証に必要
+
+    steps:
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up gcloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Copy compose file to GCE
+        run: |
+          gcloud compute scp docker-compose.prod.yml somahiranodev@${{ vars.GCE_INSTANCE_NAME }}:/opt/somadev-pages/docker-compose.prod.yml --zone=${{ vars.GCP_ZONE }} --project=${{ vars.GCP_PROJECT_ID }}
+
+      - name: Deploy to GCE
+        env:
+          GCE_INSTANCE: ${{ vars.GCE_INSTANCE_NAME }}
+          GCE_PROJECT: ${{ vars.GCP_PROJECT_ID }}
+          GCE_ZONE: ${{ vars.GCP_ZONE }}
+          GH_USER: ${{ github.actor }}
+          GH_TOKEN: ${{ secrets.GHCR_PAT }}
+        run: |
+          gcloud compute ssh somahiranodev@"$GCE_INSTANCE" --zone "$GCE_ZONE" --project "$GCE_PROJECT" --command="
+            set -e
+            
+            echo 'Logging into GitHub Container Registry...'
+            echo '$GH_TOKEN' | docker login ghcr.io -u $GH_USER --password-stdin
+
+            echo 'Navigating to project directory...'
+            cd /opt/somadev-pages
+
+            echo 'Pulling latest images from GHCR...'
+            docker-compose -f docker-compose.prod.yml pull
+
+            echo 'Starting application with new images...'
+            docker-compose -f docker-compose.prod.yml up -d --remove-orphans
+
+            echo 'Cleaning up unused Docker images...'
+            docker image prune -af
+
+            echo 'Deployment to GCE completed successfully!'
+          " 
