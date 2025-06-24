@@ -189,6 +189,9 @@ jobs:
       - name: Set up gcloud CLI
         uses: google-github-actions/setup-gcloud@v2
 
+      - name: Enable necessary APIs
+        run: gcloud services enable iamcredentials.googleapis.com --project=${{ vars.GCP_PROJECT_ID }}
+
       - name: Copy compose file to GCE
         run: |
           gcloud compute scp docker-compose.prod.yml somahiranodev@${{ vars.GCE_INSTANCE_NAME }}:/opt/somadev-pages/docker-compose.prod.yml --zone=${{ vars.GCP_ZONE }} --project=${{ vars.GCP_PROJECT_ID }}
